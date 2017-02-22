@@ -1,1 +1,93 @@
 <!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0">
+	<title>Restaurants in London UK</title>
+	<script src='http://d3js.org/d3.v3.min.js'></script>
+
+	<link rel="stylesheet" href="LondonFood.css"> 
+</head>
+<body>
+	<div id="map"></div>
+	<script type="text/javascript">
+		var map;
+		var height = window.innerHeight;
+		var width = window.innerWidth;
+		var marker;
+
+		// Create a Google Map
+		function myMap() {
+			
+			var json = "LondonFood.json";
+			var mapCanvas = document.getElementById('map');
+			var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
+			var mapOptions = {
+				center: myCenter,
+				zoom: 13,
+			};
+			var map = new google.maps.Map(mapCanvas, mapOptions);
+
+			var infoWindow = new google.maps.InfoWindow();
+
+			// Add Markers to Denote the Buildings
+            d3.json(json, function(error, json){
+            	data = json;
+            	
+            	for (i = 0; i<json.length; i++){
+            		marker = new google.maps.Marker({
+            			position: new google.maps.LatLng(json[i].Latitude, json[i].Longitude),
+            			map: map,
+            			title: json[i].BusinessName
+            		});
+
+            		google.maps.event.addListener(marker, 'click', (function(marker,i){
+            			return function(){
+            				infoWindow.setContent("<div style = 'height: 100px; width: 200px; font-size: 12px'>" 
+            					     + "<strong>" + json[i].BusinessName + "</strong>"
+            						 + "<br>" + json[i].BusinessType + "<br>"
+            					     + "Address: " + json[i].AddressLine1 	+ ", " + json[i].AddressLine2 + ", " + json[i].AddressLine3 + ", " + json[i].AddressLine4 + ", " +json[i].PostCode
+            					     + "<br>" + "Rating Value: " + json[i].RatingValue
+            					     + "<br>" + "Hygiene Rate: " + json[i].Hygiene)
+            						 + "</div>";
+            				infoWindow.open(map,marker);
+            			}
+            		})(marker,i));
+            	}
+            });
+
+            // Click on Markers to show the Info
+
+            d3.json(json, function(error,json){
+            	data = json;
+
+            	for (i = 0; i<json.length; i++){
+            		infoWindow = new google.maps.InfoWindow({
+            			content: + "<strong>" + json[i].BusinessName + "</strong>"
+            						 + "<br>" + json[i].BusinessType
+            					     + "Address: " + json[i].AddressLine1 	+ ", " + json[i].AddressLine2 + ", " + json[i].AddressLine3 + ", " + json[i].AddressLine4 + ", " +json[i].PostCode
+            					     + "<br>" + "Rating Value: " + json[i].RatingValue
+            					     + "<br>" + "Hygiene Rate: " + json[i].Hygiene
+            		}); 
+            	}
+            });
+
+			// google.maps.event.addListener(map, 'click', function (event) {
+   //             displayCoordinates(event.latLng);               
+   //          });
+		}
+
+		// Retrieve Latitudes and Longitudes
+        function displayCoordinates(pnt) {
+          var lat = pnt.lat();
+          lat = lat.toFixed(4);
+          var lng = pnt.lng();
+          lng = lng.toFixed(4);
+          console.log("lat: "+lat+ " lng: "+lng);
+        }
+		
+
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
+</body>
+</html>
