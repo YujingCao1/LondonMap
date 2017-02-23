@@ -51,15 +51,20 @@
            
             map.data.setStyle(function(feature){
                 return ({
-                    fillColor: feature.getProperty('CITY_COLOR'),
+                    fillColor: feature.getProperty('CITY_COLOR'), // feature.getProperty('CITY_COLOR') is null
                     strokeWeight: 1.5
                 })
             });
 
             // Hoover to Highlight Selected City
             map.data.addListener('mouseover', function(event) {
-                map.data.revertStyle();
-                map.data.overrideStyle(event.feature, {strokeWeight: 3, zIndex: 10});
+              map.data.revertStyle();
+              map.data.overrideStyle(event.feature, {strokeWeight: 3, zIndex: 10});
+            });
+
+            // Remove the Style
+            map.data.addListener('mouseout', function(event) {
+              map.data.revertStyle();
             });
 
         }
