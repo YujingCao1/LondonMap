@@ -26,15 +26,41 @@
 
             map = new google.maps.Map(mapCanvas, mapOptions);
             
-            
+            // Load Data Layer (London Map)
+            map.data.loadGeoJson('Economics.json');
+
             google.maps.event.addListener(map, 'click', function (event) {
                    displayCoordinates(event.latLng);               
                 });
 
-            // Load Map Shapes
-            var dataLayer = new google.maps.Data();
-            dataLayer.loadGeoJson(json)
-            dataLayer.setMap(map)
+            var color = [];
+            d3.json(json, function(error, json){
+                data = json;
+                
+                var medianWeeklyPay = [];
+                for (i=0 ; i<json.features.length; i++){
+                    medianWeeklyPay[i] = json.features[i].properties.MedWklyPay;
+                }
+                var heat_color = d3.scale.linear().domain([d3.min(medianWeeklyPay), d3.max(medianWeeklyPay)]).range(['#b2df8a', '#ff7f00']).interpolate(d3.interpolateHcl);
+
+                for (i=0 ; i<json.features.length; i++){
+                    color[i] = heat_color(json.features[i].properties.MedWklyPay)
+                    json.features[i].properties.CITY_COLOR = color[i];
+                }
+            });
+           
+            map.data.setStyle(function(feature){
+                return ({
+                    fillColor: feature.getProperty('CITY_COLOR'),
+                    strokeWeight: 1.5
+                })
+            });
+
+            // Hoover to Highlight Selected City
+            map.data.addListener('mouseover', function(event) {
+                map.data.revertStyle();
+                map.data.overrideStyle(event.feature, {strokeWeight: 3, zIndex: 10});
+            });
 
         }
         // Retrieve Latitudes and Longitudes
@@ -44,6 +70,11 @@
           var lng = pnt.lng();
           lng = lng.toFixed(4);
           console.log("lat: "+lat+ " lng: "+lng);
+        }
+
+        // Defines the callback function
+        function londonCallBack(data){
+            map.data.addGeoJson(data);
         }
         
     </script>
