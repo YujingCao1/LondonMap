@@ -1,101 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="initial-scale=1.0">
-	<title>Restaurants in London UK</title>
-	<script src='http://d3js.org/d3.v3.min.js'></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <title>Restaurants in London UK</title>
+    <script src='http://d3js.org/d3.v3.min.js'></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
 
-	<link rel="stylesheet" href="LondonFood.css"> 
+    <link rel="stylesheet" href="LondonFood.css"> 
 </head>
 <body>
-	<div id="map"></div>
-	<script type="text/javascript">
-		var map;
-		var height = window.innerHeight;
-		var width = window.innerWidth;
-		var marker;
+    <div id="map"></div>
+    <script type="text/javascript">
+        var map
+        // Create a Google Map
+        function myMap() {
+            
+            var json = "Economics.json";
+            var mapCanvas = document.getElementById('map');
+            var myCenter  = new google.maps.LatLng(51.5074,-0.1278);
+            var mapOptions = {
+                center: myCenter,
+                zoom: 10
+            };
 
-		// Create a Google Map
-		function myMap() {
-			
-			var json = "EconomicCharacteristics.json";
-			var mapCanvas = document.getElementById('map');
-			var myCenter  = new google.maps.LatLng(54.8960,-2.7198);
-			var mapOptions = {
-				center: myCenter,
-				zoom: 7,
-			};
-			map = new google.maps.Map(mapCanvas, mapOptions);
+            map = new google.maps.Map(mapCanvas, mapOptions);
+            
+            
+            google.maps.event.addListener(map, 'click', function (event) {
+                   displayCoordinates(event.latLng);               
+                });
 
-            //map.data.loadGeoJson('EconomicCharacteristics.json');
+            // Load Map Shapes
+            var dataLayer = new google.maps.Data();
+            dataLayer.loadGeoJson(json)
+            dataLayer.setMap(map)
 
-            d3.json(json, function(error, json){
-                    data = json;
-                if (error) throw error
-
-                var overlay = new google.maps.OverlayView();
-
-                overlay.onAdd = function(){
-                    var layer = d3.select(this.getPanes().overlayLayer).append("div")
-
-                    overlay.draw = function(){
-                        layer.select('svg').remove();
-
-                        var w = 900;
-                        var h = 600;
-
-                        var color = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999'];
-
-                        var medianWeeklyPay = [];
-
-                        for (i=0 ; i<json.features.length; i++){
-                            medianWeeklyPay[i] = json.features[i].properties.MedWklyPay;
-                        }
-
-                        console.log(d3.max(medianWeeklyPay))
-                        var heat_color = d3.scale.linear().domain([d3.min(medianWeeklyPay), d3.max(medianWeeklyPay)]).range(['#b2df8a', '#ff7f00']).interpolate(d3.interpolateHcl);
-                        var overlayProjection = this.getProjection();
-
-                        var googleMapProjection = function(coordinates){
-                            var googleCoordinates  = new google.maps.LatLng(coordinates[1],coordinates[0]);
-                            var pixelCoordinates  = overlayProjection.fromLatLngToDivPixel(googleCoordinates);
-                            return [pixelCoordinates.x,pixelCoordinates.y];
-                        }
-
-                        var path = d3.geo.path().projection(googleMapProjection);
-
-                        var svg = layer.append("svg")
-                         .attr('width', w)
-                         .attr('height', h)
-
-                       var g = svg.selectAll("g")
-                         .data(json)
-                         .enter()
-                         .append("g");
-
-                       g.selectAll("path")
-                         .data(json.features)
-                         .enter()
-                         .append("path")
-                         .attr("d", path)
-                         .attr('class', 'state selected')
-                         .style("fill", function(d, i) {
-                           return color[i % color.length];
-                         })
-                         .style('opacity', .7);
-                    }
-                }
-                overlay.setMap(map);
-            });
-
-			google.maps.event.addListener(map, 'click', function (event) {
-               displayCoordinates(event.latLng);               
-            });
-		}
-
-		// Retrieve Latitudes and Longitudes
+        }
+        // Retrieve Latitudes and Longitudes
         function displayCoordinates(pnt) {
           var lat = pnt.lat();
           lat = lat.toFixed(4);
@@ -103,9 +45,8 @@
           lng = lng.toFixed(4);
           console.log("lat: "+lat+ " lng: "+lng);
         }
-		
-
-	</script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
+        
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
 </body>
 </html>
