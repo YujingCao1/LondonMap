@@ -10,9 +10,34 @@
     <link rel="stylesheet" href="LondonFood.css"> 
 </head>
 <body>
+    <div id="controls" class="nicebox">
+        <div>
+            <select id="census-variable" onChnage = "changeAttribute(this);">
+                <option value = 0>Job Density</option>
+                <option value = 1>Median Weekly Pay</option>
+                <option value = 2>SQKM</option>
+                <option value = 3>MdWrkPlcPa</option>
+            </select>
+        </div>
+        <div id="legend">
+            <div id="census-min">min</div>
+            <div class="color-key"><span id="data-caret">&#x25c6;</span></div>
+            <div id="census-max">max</div>
+        </div>
+    </div>
+    <div id="data-box", class="nicebox">
+        <label id="data-label" for="data-value"></label>
+        <span id="data-value"></span>
+    </div>
     <div id="map"></div>
     <script type="text/javascript">
         var map;
+        var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
+        var optionsAttr = document.getElementById('census-variable');
+        var attribute  = optionsAttr.options[optionsAttr.selectedIndex].text;
+
+        console.log(attribute);
+
         // Create a Google Map
         function myMap() {
             
@@ -41,14 +66,14 @@
                 
                 var medianWeeklyPay = [];
                 for (i=0 ; i<json.features.length; i++){
-                    medianWeeklyPay[i] = json.features[i].properties.MedWklyPay;
+                    medianWeeklyPay[i] = json.features[i].properties.JOBS_DENSI;
                 }
                 MinValue = d3.min(medianWeeklyPay);
                 MaxValue = d3.max(medianWeeklyPay)
                 heat_color = d3.scale.linear().domain([MinValue, MaxValue]).range(['#AF4FAE','#4FAEAF','#0F2223','#E21512']).interpolate(d3.interpolateHcl);
 
                 for (i=0 ; i<json.features.length; i++){
-                    color[i] = heat_color(json.features[i].properties.MedWklyPay)
+                    color[i] = heat_color(json.features[i].properties.JOBS_DENSI)
                     json.features[i].properties.CITY_COLOR = color[i];
                 }
             });
@@ -57,14 +82,14 @@
                 var low = [5,69,54];
                 var high = [151, 83,34];
 
-                var delta = (feature.getProperty('MedWklyPay') - MinValue)/ (MaxValue - MinValue);
+                var delta = (feature.getProperty('JOBS_DENSI') - MinValue)/ (MaxValue - MinValue);
                 var colorFill = [];
                 for (var i = 0;i < 3;i++){
                     colorFill[i] = (high[i] - low[i]) * delta + low[i];
                 }
 
                 return ({
-                    fillColor: heat_color(feature.getProperty('MedWklyPay')), // MedWklyPay is very close, so it is hard to differentiate the color
+                    fillColor: heat_color(feature.getProperty('JOBS_DENSI')), // MedWklyPay is very close, so it is hard to differentiate the color
                     strokeWeight: 1.5,
                     fillOpacity: 0.75,
                 })
@@ -82,6 +107,12 @@
             });
 
         }
+
+        // Get Attribute
+        function changeAttribute(sel){
+            sel.option[sel.selectedIndex].text;
+        }
+        
         // Retrieve Latitudes and Longitudes
         function displayCoordinates(pnt) {
           var lat = pnt.lat();
@@ -91,11 +122,24 @@
           console.log("lat: "+lat+ " lng: "+lng);
         }
 
-        // Defines the callback function
-        function londonCallBack(data){
-            map.data.addGeoJson(data);
+        // Event Mouseover
+        function mouseInToRegion(e){
+            e.feature.setProperty('state','hover');
+
+            var percent = (e.feature.getProperty('census_variable') - censusMin) /(censusMax - censusMin) * 100;
+
+          // update the label
+            document.getElementById('data-label').textContent = e.feature.getProperty('PROV3NAME');
+            document.getElementById('data-value').textContent = e.feature.getProperty('census_variable').toLocaleString();
+            document.getElementById('data-box').style.display = 'block';
+            document.getElementById('data-caret').style.display = 'block';
+            document.getElementById('data-caret').style.paddingLeft = percent + '%';
         }
-        
+
+        // Event Mouseout
+        function mouseOutOfRegion(e){
+            e.feature.setProperty('state','normal');
+        }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
 </body>
