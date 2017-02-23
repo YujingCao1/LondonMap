@@ -12,7 +12,7 @@
 <body>
     <div id="map"></div>
     <script type="text/javascript">
-        var map
+        var map;
         // Create a Google Map
         function myMap() {
             
@@ -34,6 +34,8 @@
                 });
 
             var color = [];
+            var heat_color;
+            var MinValue, MaxValue;
             d3.json(json, function(error, json){
                 data = json;
                 
@@ -41,18 +43,30 @@
                 for (i=0 ; i<json.features.length; i++){
                     medianWeeklyPay[i] = json.features[i].properties.MedWklyPay;
                 }
-                var heat_color = d3.scale.linear().domain([d3.min(medianWeeklyPay), d3.max(medianWeeklyPay)]).range(['#b2df8a', '#ff7f00']).interpolate(d3.interpolateHcl);
+                MinValue = d3.min(medianWeeklyPay);
+                MaxValue = d3.max(medianWeeklyPay)
+                heat_color = d3.scale.linear().domain([MinValue, MaxValue]).range(['#AF4FAE','#4FAEAF','#0F2223','#E21512']).interpolate(d3.interpolateHcl);
 
                 for (i=0 ; i<json.features.length; i++){
                     color[i] = heat_color(json.features[i].properties.MedWklyPay)
                     json.features[i].properties.CITY_COLOR = color[i];
                 }
             });
-           
+
             map.data.setStyle(function(feature){
+                var low = [5,69,54];
+                var high = [151, 83,34];
+
+                var delta = (feature.getProperty('MedWklyPay') - MinValue)/ (MaxValue - MinValue);
+                var colorFill = [];
+                for (var i = 0;i < 3;i++){
+                    colorFill[i] = (high[i] - low[i]) * delta + low[i];
+                }
+
                 return ({
-                    fillColor: feature.getProperty('CITY_COLOR'), // feature.getProperty('CITY_COLOR') is null
-                    strokeWeight: 1.5
+                    fillColor: heat_color(feature.getProperty('MedWklyPay')), // MedWklyPay is very close, so it is hard to differentiate the color
+                    strokeWeight: 1.5,
+                    fillOpacity: 0.75,
                 })
             });
 
