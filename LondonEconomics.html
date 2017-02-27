@@ -37,7 +37,6 @@
         var optionsAttr = document.getElementById('census-variable');
         var attribute  = optionsAttr.options[optionsAttr.selectedIndex].text; // Show the selected one
 
-
         // Create a Google Map
         function myMap() {
             
@@ -109,7 +108,7 @@
             var selectBox = document.getElementById('census-variable');
             google.maps.event.addDomListener(selectBox, 'change', function(){
                 clearData();
-                loadData(selectBox.options[selectBox.selectedIndex].value);
+                loadData();
 
             });
 
@@ -125,13 +124,16 @@
         }
 
         // Load Data
-        function loadData(variable){
+        function loadData(){
             var json = "Economics.json";
+            var variable = optionsAttr.value;
 
             d3.json(json, function(error, json){
                 data = json;
+
                 for (var i = 0; i < json.features.length; i++) {
-                    var censusVariable = json.features[i].properties.variable;
+
+                    var censusVariable = json.features[i].properties[variable];
                     var cityID = json.features[i].properties.PROV3NAME;
 
                     // Keep Track of Min and Max Values
@@ -189,6 +191,7 @@
         function mouseOutOfRegion(e){
            map.data.revertStyle();
         }
+
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
 </body>
