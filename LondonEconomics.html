@@ -6,17 +6,18 @@
     <title>Restaurants in London UK</title>
     <script src='http://d3js.org/d3.v3.min.js'></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
+    <script src="js/colorbrewer.js"></script>
 
     <link rel="stylesheet" href="LondonFood.css"> 
 </head>
 <body>
     <div id="controls" class="nicebox">
         <div>
-            <select id="census-variable" onChnage = "changeAttribute(this);">
-                <option value = 0>Job Density</option>
-                <option value = 1>Median Weekly Pay</option>
-                <option value = 2>SQKM</option>
-                <option value = 3>MdWrkPlcPa</option>
+            <select id="census-variable">
+                <option value = JOBS_DENSI>Job Density</option>
+                <option value = MedWklyPay>Median Weekly Pay</option>
+                <option value = SQKM>SQKM</option>
+                <option value = MdWrkPlcPa>MdWrkPlcPa</option>
             </select>
         </div>
         <div id="legend">
@@ -34,9 +35,8 @@
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable');
-        var attribute  = optionsAttr.options[optionsAttr.selectedIndex].text;
+        var attribute  = optionsAttr.options[optionsAttr.selectedIndex].text; // Show the selected one
 
-        console.log(attribute);
 
         // Create a Google Map
         function myMap() {
@@ -52,7 +52,7 @@
             map = new google.maps.Map(mapCanvas, mapOptions);
             
             // Load Data Layer (London Map)
-            map.data.loadGeoJson('Economics.json');
+            //map.data.loadGeoJson('Economics.json');
 
             google.maps.event.addListener(map, 'click', function (event) {
                    displayCoordinates(event.latLng);               
@@ -60,57 +60,107 @@
 
             var color = [];
             var heat_color;
-            var MinValue, MaxValue;
+            var MinValue = 0;
+            var MaxValue = 100;
+
             d3.json(json, function(error, json){
                 data = json;
-                
+
                 var medianWeeklyPay = [];
                 for (i=0 ; i<json.features.length; i++){
                     medianWeeklyPay[i] = json.features[i].properties.JOBS_DENSI;
                 }
                 MinValue = d3.min(medianWeeklyPay);
-                MaxValue = d3.max(medianWeeklyPay)
-                heat_color = d3.scale.linear().domain([MinValue, MaxValue]).range(['#AF4FAE','#4FAEAF','#0F2223','#E21512']).interpolate(d3.interpolateHcl);
+                MaxValue = d3.max(medianWeeklyPay);
 
-                for (i=0 ; i<json.features.length; i++){
-                    color[i] = heat_color(json.features[i].properties.JOBS_DENSI)
-                    json.features[i].properties.CITY_COLOR = color[i];
-                }
+                // heat_color = d3.scale.linear().domain([MinValue, MaxValue]).range(['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b']);
+            
+
+
+                map.data.setStyle(function(feature){
+                    var low = [5, 69, 54];
+                    var high = [151, 83, 34];
+
+                    var delta = (feature.getProperty('JOBS_DENSI') - MinValue)/ (MaxValue - MinValue);
+                    var colorFill = [];
+                    for (var i = 0; i < 3; i++){
+                        colorFill[i] = (high[i] - low[i]) * delta + low[i];
+                    }
+                  
+                    return ({
+                        fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)', // MedWklyPay is very close, so it is hard to differentiate the color
+                        strokeWeight: 1.2,
+                        fillOpacity: 0.8,
+                        strokeColor: '#fff'
+
+                    })
+                });
+
+                // Hoover to Highlight Selected City
+                map.data.addListener('mouseover', function(event) {
+                  map.data.revertStyle();
+                  map.data.overrideStyle(event.feature, {strokeWeight: 3, zIndex: 10});
+                });
+
+                // Remove the Style
+                map.data.addListener('mouseout', function(event) {
+                  map.data.revertStyle();
+                });
+
+                // Change the Legends
+                document.getElementById('census-min').textContent = MinValue;
+                document.getElementById('census-max').textContent = MaxValue;
             });
 
-            map.data.setStyle(function(feature){
-                var low = [5,69,54];
-                var high = [151, 83,34];
-
-                var delta = (feature.getProperty('JOBS_DENSI') - MinValue)/ (MaxValue - MinValue);
-                var colorFill = [];
-                for (var i = 0;i < 3;i++){
-                    colorFill[i] = (high[i] - low[i]) * delta + low[i];
-                }
-
-                return ({
-                    fillColor: heat_color(feature.getProperty('JOBS_DENSI')), // MedWklyPay is very close, so it is hard to differentiate the color
-                    strokeWeight: 1.5,
-                    fillOpacity: 0.75,
-                })
-            });
-
-            // Hoover to Highlight Selected City
-            map.data.addListener('mouseover', function(event) {
-              map.data.revertStyle();
-              map.data.overrideStyle(event.feature, {strokeWeight: 3, zIndex: 10});
-            });
-
-            // Remove the Style
-            map.data.addListener('mouseout', function(event) {
-              map.data.revertStyle();
-            });
+            loadMapShapes();
+            var selectBox = document.getElementById('census-variable');
+            loadData(selectBox.options[selectBox.selectedIndex].value);
 
         }
 
-        // Get Attribute
-        function changeAttribute(sel){
-            sel.option[sel.selectedIndex].text;
+        // Load the Map GeoJSON
+        function loadMapShapes(){
+            map.data.loadGeoJson('Economics.json');
+            google.maps.event.addListenerOnce(map, 'addfeature', function(){
+                 google.maps.event.trigger(document.getElementById('census_variable'), 'change');
+            })
+        }
+
+        // Load Data
+        function loadData(variable){
+            var json = "Economics.json";
+
+            d3.json(json, function(error, json){
+                data = json;
+                for (var i = 0; i < json.features.length; i++) {
+                    var censusVariable = json.features[i].properties.JOBS_DENSI;
+                    var cityID = json.features[i].properties.PROV3NAME;
+
+                    // Keep Track of Min and Max Values
+                    if (censusVariable < censusMin){
+                        censusMin = censusVariable;
+                    }
+
+                    if (censusVariable > censusMax){
+                        censusMax = censusVariable;
+                    }
+
+                    // Update and Display the legend
+
+                    document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                    document.getElementById('census-min').textContent = censusMin.toLocaleString();
+
+                }
+            });
+        }
+
+        // Remove Data
+        function clearData() {
+            censusMin = Number.MAX_VALUE;
+            censusMax = -Number.MAX_VALUE;
+
+            document.getElementById('data-box').style.display = 'none';
+            document.getElementById('data-caret').style.display = 'none';
         }
         
         // Retrieve Latitudes and Longitudes
