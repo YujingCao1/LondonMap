@@ -34,8 +34,7 @@
     <script type="text/javascript">
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
-        var optionsAttr = document.getElementById('census-variable');
-        var attribute  = optionsAttr.options[optionsAttr.selectedIndex].text; // Show the selected one
+        var optionsAttr = document.getElementById('census-variable'); // Show the selected one
 
         // Create a Google Map
         function myMap() {
@@ -49,82 +48,78 @@
             };
 
             map = new google.maps.Map(mapCanvas, mapOptions);
-            
-            // Load Data Layer (London Map)
-            map.data.loadGeoJson('Economics.json');
 
-            google.maps.event.addListener(map, 'click', function (event) {
-                   displayCoordinates(event.latLng);               
+            // Hoover to Highlight Selected City
+            map.data.addListener('mouseover', mouseInToRegion);
+            // Remove the Style
+            map.data.addListener('mouseout', mouseOutOfRegion);
+            // Set Up Dropdown
+            google.maps.event.addDomListener(optionsAttr, 'change', function(){
+                clearData();
+                loadData(optionsAttr.options[optionsAttr.selectedIndex].value);
+            });
+
+            google.maps.event.addDomListener(optionsAttr, 'change', function(){
+                var MinValue;
+                var MaxValue;
+                var attribution = optionsAttr.options[optionsAttr.selectedIndex].value;
+                var attr_value = [];
+                var colorFill = [];
+
+                d3.json(json, function(error, json){
+                    data = json;
+
+                    for (i=0 ; i<json.features.length; i++){
+                        attr_value[i] = json.features[i].properties[attribution];
+                    }
+
+                    MinValue = d3.min(attr_value);
+                    MaxValue = d3.max(attr_value);
                 });
 
-            var color = [];
-            var heat_color;
-            var MinValue = 0;
-            var MaxValue = 100;
-
-            d3.json(json, function(error, json){
-                data = json;
-
-                var medianWeeklyPay = [];
-                for (i=0 ; i<json.features.length; i++){
-                    medianWeeklyPay[i] = json.features[i].properties.JOBS_DENSI;
-                }
-                MinValue = d3.min(medianWeeklyPay);
-                MaxValue = d3.max(medianWeeklyPay);
-
-                // heat_color = d3.scale.linear().domain([MinValue, MaxValue]).range(['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b']);
-            
-
-
-                map.data.setStyle(function(feature){
+                    map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
-
-                    var delta = (feature.getProperty('JOBS_DENSI') - MinValue)/ (MaxValue - MinValue);
-                    var colorFill = [];
+                    var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
-                  
+
                     return ({
-                        fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)', // MedWklyPay is very close, so it is hard to differentiate the color
+                        fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
                         strokeWeight: 1.2,
                         fillOpacity: 0.8,
-                        strokeColor: '#fff'
+                        strokeColor: '#fff',
+                        visible: true
 
                     })
                 });
-
-                // Hoover to Highlight Selected City
-                map.data.addListener('mouseover', mouseInToRegion);
-                // Remove the Style
-                map.data.addListener('mouseout', mouseOutOfRegion);
-
-                // Change the Legends
-                document.getElementById('census-min').textContent = MinValue;
-                document.getElementById('census-max').textContent = MaxValue;
-            });
-
-            var selectBox = document.getElementById('census-variable');
-            google.maps.event.addDomListener(selectBox, 'change', function(){
-                clearData();
-                loadData();
-
-            });
+            })
+            // Get Lat and Lng
+            google.maps.event.addListener(map, 'click', function (event) {
+                   displayCoordinates(event.latLng);               
+                });
+            // Load the Map
+            loadMapShapes();
         }
 
+        // Load Map
+        function loadMapShapes(){
+            map.data.loadGeoJson('Economics.json');
+            google.maps.event.trigger(document.getElementById('census-variable'), 'change');
+
+        }
 
         // Load Data
-        function loadData(){
+        function loadData(d){
             var json = "Economics.json";
-            var variable = optionsAttr.value;
 
             d3.json(json, function(error, json){
                 data = json;
 
                 for (var i = 0; i < json.features.length; i++) {
 
-                    var censusVariable = json.features[i].properties[variable];
+                    var censusVariable = json.features[i].properties[d];
                     var cityID = json.features[i].properties.PROV3NAME;
 
                     // Keep Track of Min and Max Values
@@ -165,6 +160,7 @@
 
         // Event Mouseover
         function mouseInToRegion(e){
+            map.data.revertStyle();
             var variable = optionsAttr.value;
             var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
 
@@ -183,6 +179,45 @@
            map.data.revertStyle();
         }
 
+        // Style Function
+        function styleFeature(feature){
+            var json = 'Economics.json';
+            var MinValue;
+            var MaxValue;
+            var attribution = optionsAttr.options[optionsAttr.selectedIndex].value;
+            var attr_value = [];
+            var colorFill = [];
+            d3.json(json, function(error, json){
+                data = json;
+
+                for (i=0 ; i<json.features.length; i++){
+                    attr_value[i] = json.features[i].properties[attribution];
+                }
+
+                MinValue = d3.min(attr_value);
+                MaxValue = d3.max(attr_value);
+            });
+
+                var low = [5, 69, 54];
+                var high = [151, 83, 34];
+                var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                for (var i = 0; i < 3; i++){
+                    colorFill[i] = (high[i] - low[i]) * delta + low[i];
+                }
+                return ({
+                    fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
+                    strokeWeight: 1.2,
+                    fillOpacity: 0.8,
+                    strokeColor: '#fff'
+
+                })
+        }
+
+        // Change Attribute
+        function changeAttribute(){
+            var optionsAttr = document.getElementById('census-variable');
+            return optionsAttr.options[optionsAttr.selectedIndex].value;
+        }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
 </body>
