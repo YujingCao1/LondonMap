@@ -14,10 +14,10 @@
     <div id="controls" class="nicebox">
         <div>
             <select id="census-variable">
-                <option value = JOBS_DENSI>Job Density</option>
-                <option value = MedWklyPay>Median Weekly Pay</option>
-                <option value = SQKM>Square Kilometers</option>
-                <option value = MdWrkPlcPa>Median Work Place Pay</option>
+                <option value = 2001POP>Population in Year 2011</option>
+                <option value = INHOUSEHOL>INHOUSEHOL</option>
+                <option value = INCOMMUNAL>INCOMMUNAL</option>
+                <option value = STUDENTAWA>STUDENTAWA</option>
             </select>
         </div>
         <div id="legend">
@@ -35,10 +35,11 @@
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
+        var marker;
         // Create a Google Map
         function myMap() {
             
-            var json = "Economics.json";
+            var json = "PopulationCharacteristics.json";
             var mapCanvas = document.getElementById('map');
             var myCenter  = new google.maps.LatLng(51.5074,-0.1278);
             var mapOptions = {
@@ -57,6 +58,7 @@
                 clearData();
                 loadData(optionsAttr.options[optionsAttr.selectedIndex].value);
             });
+
             google.maps.event.addDomListener(optionsAttr, 'change', function(){
                 var MinValue;
                 var MaxValue;
@@ -81,12 +83,13 @@
                     }
                     return ({
                         fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
-                        strokeWeight: 1.2,
+                        strokeWeight: 0,
                         fillOpacity: 0.8,
                         strokeColor: '#fff'
                     })
                 });
             })
+   
             // Get Lat and Lng
             google.maps.event.addListener(map, 'click', function (event) {
                    displayCoordinates(event.latLng);               
@@ -96,12 +99,12 @@
         }
         // Load Map
         function loadMapShapes(){
-            map.data.loadGeoJson('Economics.json');
+            map.data.loadGeoJson('PopulationCharacteristics.json');
             google.maps.event.trigger(document.getElementById('census-variable'), 'change');
         }
         // Load Data
         function loadData(d){
-            var json = "Economics.json";
+            var json = "PopulationCharacteristics.json";
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
@@ -141,7 +144,7 @@
             var variable = optionsAttr.value;
             var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
           // update the label
-            document.getElementById('data-label').textContent = e.feature.getProperty('PROV3NAME');
+            document.getElementById('data-label').textContent = e.feature.getProperty('COA_Code');
             document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
