@@ -10,23 +10,34 @@
 </head>
 <body>
 	<div id="map"></div>
+    <div id="pano"></div>
 	<script type="text/javascript">
 		var map;
 		var height = window.innerHeight;
 		var width = window.innerWidth;
 		var marker;
+        var panorama;
 
 		// Create a Google Map
 		function myMap() {
 			
 			var json = "LondonFood.json";
+            var London = {lat:51.5074, lng:-0.1272};
+            var sv =  new google.maps.StreetViewService();
 			var mapCanvas = document.getElementById('map');
 			var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
 			var mapOptions = {
 				center: myCenter,
-				zoom: 13,
+				zoom: 13
 			};
-			var map = new google.maps.Map(mapCanvas, mapOptions);
+			map = new google.maps.Map(mapCanvas, mapOptions);
+            panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'),{
+                position: London,
+                pov:{
+                    heading: 34,
+                    pitch: 10
+                }
+            })
 
 			var infoWindow = new google.maps.InfoWindow();
 
@@ -38,7 +49,8 @@
             		marker = new google.maps.Marker({
             			position: new google.maps.LatLng(json[i].Latitude, json[i].Longitude),
             			map: map,
-            			title: json[i].BusinessName
+            			title: json[i].BusinessName,
+                        /*icon: 'restaurant.jpg'*/
             		});
 
             		google.maps.event.addListener(marker, 'click', (function(marker,i){
@@ -51,6 +63,7 @@
             					     + "<br>" + "Hygiene Rate: " + json[i].Hygiene)
             						 + "</div>";
             				infoWindow.open(map,marker);
+
             			}
             		})(marker,i));
             	}
@@ -72,6 +85,14 @@
             	}
             });
 
+            map.setStreetView(panorama);
+            // map.addListener('click', function(event){
+            //     sv.getPanorama({
+            //         location:event.latLng,
+            //         radius: 50
+            //     }, processSVData)
+            // });
+
 			// google.maps.event.addListener(map, 'click', function (event) {
    //             displayCoordinates(event.latLng);               
    //          });
@@ -86,6 +107,28 @@
           console.log("lat: "+lat+ " lng: "+lng);
         }
 		
+        function processSVData(data, status){
+            if (status === 'OK'){
+                panorama.setPano(data.location.pano);
+                panorama.setPov({
+                    heading: 270,
+                    pitch: 0
+                });
+                panorama.setVisible(true);
+
+                google.maps.event.addListener(marker,'click', function(){
+                    var markerPanoID = data.location.panorama;
+                    panorama.setPano(markerPanoID);
+                    panorama.setPov({
+                        heading: 270,
+                        pitch: 0
+                    });
+                    panorama.setVisible(true);
+                });
+            }else{
+                console.error('Street View data not found for this location');
+            }
+        }
 
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>

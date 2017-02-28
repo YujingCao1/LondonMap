@@ -35,12 +35,10 @@
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
-        var marker;
         // Create a Google Map
         function myMap() {
             
             var json = "Economics.json";
-            var foodJson = "LondonFood.json";
             var mapCanvas = document.getElementById('map');
             var myCenter  = new google.maps.LatLng(51.5074,-0.1278);
             var mapOptions = {
@@ -50,52 +48,6 @@
 
             // Load Map
             map = new google.maps.Map(mapCanvas, mapOptions);
-
-            var infoWindow = new google.maps.InfoWindow();
-
-            // Add Markers to Denote the Buildings
-            d3.json(foodJson, function(error, json){
-                data = foodJson;
-                
-                for (i = 0; i<foodJson.length; i++){
-                    marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(foodJson[i].Latitude, foodJson[i].Longitude),
-                        map: map,
-                        title: foodJson[i].BusinessName
-                    });
-
-                    google.maps.event.addListener(marker, 'click', (function(marker,i){
-                        return function(){
-                            infoWindow.setContent("<div style = 'height: 100px; width: 200px; font-size: 12px'>" 
-                                     + "<strong>" + foodJson[i].BusinessName + "</strong>"
-                                     + "<br>" + foodJson[i].BusinessType + "<br>"
-                                     + "Address: " + foodJson[i].AddressLine1   + ", " + foodJson[i].AddressLine2 + ", " + foodJson[i].AddressLine3 + ", " + foodJson[i].AddressLine4 + ", " + foodJson[i].PostCode
-                                     + "<br>" + "Rating Value: " + foodJson[i].RatingValue
-                                     + "<br>" + "Hygiene Rate: " + foodJson[i].Hygiene)
-                                     + "</div>";
-                            infoWindow.open(map,marker);
-                        }
-                    })(marker,i));
-                }
-            });
-
-            // Click on Markers to show the Info
-
-            d3.json(foodJson, function(error,json){
-                data = foodJson;
-
-                for (i = 0; i<foodJson.length; i++){
-                    infoWindow = new google.maps.InfoWindow({
-                        content: + "<strong>" + foodJson[i].BusinessName + "</strong>"
-                                     + "<br>" + foodJson[i].BusinessType
-                                     + "Address: " + foodJson[i].AddressLine1   + ", " + foodJson[i].AddressLine2 + ", " + foodJson[i].AddressLine3 + ", " + foodJson[i].AddressLine4 + ", " +foodJson[i].PostCode
-                                     + "<br>" + "Rating Value: " + foodJson[i].RatingValue
-                                     + "<br>" + "Hygiene Rate: " + foodJson[i].Hygiene
-                    }); 
-                }
-            });
-
-            
             // Hoover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
