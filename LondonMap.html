@@ -3,8 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="initial-scale=1.0">
-	<title>Restaurants in London UK</title>
+	<title>London Map</title>
 	<script src='http://d3js.org/d3.v3.min.js'></script>
+    <script src='js/geoxml3.js'></script>
 
 	<link rel="stylesheet" href="LondonMap.css"> 
 </head>
@@ -31,8 +32,20 @@
 			};
 			map = new google.maps.Map(mapCanvas, mapOptions);
 
-            layers[0] = new google.maps.KmlLayer('Economics.kml?time='+new Date().getTime(), {preserViewport: true});
-            layers[1] = new google.maps.KmlLayer('Economics.kml?time='+new Date().getTime(), {preserViewport: true});
+            // layers[0] = new geoXML3.parser({map:map, preserveViewport: true});
+            // layers[0].parse('Economics.kml');
+            // layers[1] = new geoXML3.parser({map:map, preserveViewport: true});
+            // layers[1].parse('Economics.kml');
+
+            layers[0] = new google.maps.KmlLayer({
+                url: 'http://dasil.grinnell.edu/visualizations/Data/Economics.kml',
+                map: map
+            })
+
+            layers[1] = new google.maps.KmlLayer({
+                url: 'http://dasil.grinnell.edu/visualizations/Data/Economics.kml',
+                map: map
+            })
 
             for (var i = 0; i < layers.length; i++){
                 layers[i].setMap(map);
