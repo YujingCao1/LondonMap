@@ -13,12 +13,7 @@
 <body>
     <div id="controls" class="nicebox">
         <div>
-            <select id="census-variable">
-                <option value = JOBS_DENSI>Job Density</option>
-                <option value = MedWklyPay>Median Weekly Pay</option>
-                <option value = SQKM>Square Kilometers</option>
-                <option value = MdWrkPlcPa>Median Work Place Pay</option>
-            </select>
+            <select id="census-variable"></select>
         </div>
         <div id="legend">
             <div id="census-min" style="">min</div>
@@ -51,8 +46,25 @@
         d3.selectAll("input[id=layer0]").on('change', function(){
             layer1_file = false;
             layer0_file = true;
-           json = $('input[id=layer0]').val() + ".json";
+            json = $('input[id=layer0]').val() + ".json";
+            document.getElementsByClassName('dataset').innerHTML = "";
+            var attributionJSON = d3.json('PopList.json',function(json){
+                attributesJSON = json;
+                d3.select("#census-variable").selectAll("option")
+                        .data(attributesJSON)
+                        .enter()
+                        .append("option")
+                        .attr("id", function(d,i) {
+                            return ("option" + i)
+                        })
+                        .text(function(d) {
+                            return d.name;
+                        })
+                        .attr("value", function(d){
+                            return d.id;
+                        })
 
+           });
            myMap();
         })
 
@@ -60,8 +72,27 @@
             layer1_file = true;
             layer0_file = false;
             json = $('input[id=layer1]').val() + ".json";
+            document.getElementsByClassName('dataset').innerHTML = "";
+            var attributionJSON = d3.json('EconList.json',function(json){
+                attributesJSON = json;
+                d3.select("#census-variable").selectAll("option")
+                        .data(attributesJSON)
+                        .enter()
+                        .append("option")
+                        .attr("id", function(d,i) {
+                            return ("option" + i)
+                        })
+                        .text(function(d) {
+                            return d.name;
+                        })
+                        .attr("value", function(d){
+                            return d.id;
+                        })
+
+           })
             myMap();
         })
+
 		// Create a Google Map
 		function myMap() {
 			var mapCanvas = document.getElementById('map');
@@ -70,6 +101,7 @@
 				center: myCenter,
 				zoom: 10
 			};
+
 			map = new google.maps.Map(mapCanvas, mapOptions);
 
 			// // Hoover to Highlight Selected City
@@ -79,7 +111,7 @@
             // Set Up Dropdown
             google.maps.event.addDomListener(optionsAttr, 'change', function(){
                 clearData();
-                loadData(optionsAttr.options[optionsAttr.selectedIndex].value);
+                loadData(json,optionsAttr.options[optionsAttr.selectedIndex].value);
             });
             google.maps.event.addDomListener(optionsAttr, 'change', function(){
                 var MinValue;
@@ -87,7 +119,7 @@
                 var attribution = optionsAttr.options[optionsAttr.selectedIndex].value;
                 var attr_value = [];
                 var colorFill = [];
-
+                
                 d3.json(json, function(error, json){
                     data = json;
                     for (i=0 ; i<json.features.length; i++){
@@ -117,11 +149,10 @@
         // Load Map
         function loadMapShapes(){
             map.data.loadGeoJson(json);
-
             google.maps.event.trigger(document.getElementById('census-variable'), 'change');
         }
         // Load Data
-        function loadData(d){
+        function loadData(json, d){
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
@@ -161,7 +192,6 @@
             map.data.revertStyle();
             var variable = optionsAttr.value;
             var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
-            json = $('input[name="dataset"]:checked').val() + ".json";
           // update the label
             var name;
             if (json == 'Population.json'){
@@ -179,6 +209,27 @@
         // Event Mouseout
         function mouseOutOfRegion(e){
            map.data.revertStyle();
+        }
+
+        // Load Dropdown List
+        function dropDown(data){
+           d3.json(data,function(error,json){
+            attributesJSON = data;
+                d3.select("#census-variable").selectAll("option")
+                        .data(attributesJSON)
+                        .enter()
+                        .append("option")
+                        .attr("id", function(d,i) {
+                            return ("option" + i)
+                        })
+                        .text(function(d) {
+                            return d.name;
+                        })
+                        .attr("value", function(d){
+                            return d.id;
+                        })
+
+           })
         }
 
 	</script>
