@@ -1,0 +1,150 @@
+[
+	{
+		"id": "2001POP",
+		"name": "Population in Year 2001"
+	},
+	{
+		"id": "2001MALE",
+		"name": "Males in Year 2001"
+	},
+	{
+		"id": "2001FEMALE",
+		"name": "Females in Year 2001"
+	},
+	{
+		"id": "INHOUSEHOL",
+		"name": "INHOUSEHOL"
+	},
+	{
+		"id": "INCOMMUNAL",
+		"name": "INCOMMUNAL"
+	},
+	{
+		"id": "STUDENTAWA",
+		"name": "STUDENTAWA"
+	},
+	{
+		"id": "BORNENGLAN",
+		"name": "BORNENGLAN"
+	},
+	{
+		"id": "BORNSCOTLA",
+		"name": "BORNSCOTLA"
+	},
+	{
+		"id": "BORNWALES",
+		"name": "BORNWALES"
+	},
+	{
+		"id": "BORNNIRELA",
+		"name": "BORNNIRELA"
+	},
+	{
+		"id": "BORNEU",
+		"name": "BORNEU"
+	},
+	{
+		"id": "BORNELSEWH",
+		"name": "BORNELSEWH"
+	},
+	{
+		"id": "BORNREPIRE",
+		"name": "BORNREPIRE"
+	},
+	{
+		"id": "WHBRITISH",
+		"name": "WHBRITISH"
+	},
+	{
+		"id": "WHIRISH",
+		"name": "WHIRISH"
+	},
+	{
+		"id": "WHITEOTHER",
+		"name": "WHITEOTHER"
+	},
+	{
+		"id": "WHANDBLCAR",
+		"name": "WHANDBLCAR"
+	},
+	{
+		"id": "WHANDBLAFR",
+		"name": "WHANDBLAFR"
+	},
+	{
+		"id": "WHANDASIAN",
+		"name": "WHANDASIAN"
+	},
+	{
+		"id": "MIXEDOTHER",
+		"name": "MIXEDOTHER"
+	},
+	{
+		"id": "INDIAN",
+		"name": "INDIAN"
+	},
+	{
+		"id": "PAKISTANI",
+		"name": "PAKISTANI"
+	},
+	{
+		"id": "BANGLDESHI",
+		"name": "BANGLDESHI"
+	},
+	{
+		"id": "OTHERASIAN",
+		"name": "OTHERASIAN"
+	},
+	{
+		"id": "BLCARIBBEA",
+		"name": "BLCARIBBEA"
+	},
+	{
+		"id": "BLAFRICAN",
+		"name": "BLAFRICAN"
+	},
+	{
+		"id": "OTHER_BLAC",
+		"name": "OTHER_BLAC"
+	},
+	{
+		"id": "CHINESE",
+		"name": "CHINESE"
+	},
+	{
+		"id": "CHRISTIAN",
+		"name": "CHRISTIAN"
+	},
+	{
+		"id": "BUDDHIST",
+		"name": "BUDDHIST"
+	},
+	{
+		"id": "HINDU",
+		"name": "HINDU"
+	},
+	{
+		"id": "JEWISH",
+		"name": "JEWISH"
+	},
+	{
+		"id": "MUSLIM",
+		"name": "MUSLIM"
+	},
+	{
+		"id": "SIKH",
+		"name": "SIKH"
+	},
+	{
+		"id": "OTHERRELIG",
+		"name": "OTHERRELIG"
+	},
+	{
+		"id": "NORELION",
+		"name": "NORELION"
+	},
+	{
+		"id": "RELNOTSTAT",
+		"name": "RELNOTSTAT"
+	}
+]
