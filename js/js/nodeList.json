@@ -1,0 +1,785 @@
+[
+  {
+    "node_list": "UBS.Investment.Bank",
+    "col": "#87CEEB",
+    "size": 36,
+    "shape": "circle",
+    "title": "UBS.Investment.Bank"
+  },
+  {
+    "node_list": "Merrill.Lynch...Maxim.Group",
+    "col": "#87CEEB",
+    "size": 9,
+    "shape": "circle",
+    "title": "Merrill.Lynch...Maxim.Group"
+  },
+  {
+    "node_list": "Merrill.Lynch",
+    "col": "#87CEEB",
+    "size": 51,
+    "shape": "circle",
+    "title": "Merrill.Lynch"
+  },
+  {
+    "node_list": "Lehman.Brothers...SG.Americas.Securities",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Lehman.Brothers...SG.Americas.Securities"
+  },
+  {
+    "node_list": "Royal.Bank.of.Scotland",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Royal.Bank.of.Scotland"
+  },
+  {
+    "node_list": "Citigroup",
+    "col": "#87CEEB",
+    "size": 33,
+    "shape": "circle",
+    "title": "Citigroup"
+  },
+  {
+    "node_list": "Deutsche.Bank.Securities",
+    "col": "#87CEEB",
+    "size": 9,
+    "shape": "circle",
+    "title": "Deutsche.Bank.Securities"
+  },
+  {
+    "node_list": "Lehman.Brothers",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Lehman.Brothers"
+  },
+  {
+    "node_list": "RBS.Greenwich.Capital",
+    "col": "#87CEEB",
+    "size": 21,
+    "shape": "circle",
+    "title": "RBS.Greenwich.Capital"
+  },
+  {
+    "node_list": "Calyon",
+    "col": "#87CEEB",
+    "size": 12,
+    "shape": "circle",
+    "title": "Calyon"
+  },
+  {
+    "node_list": "Morgan.Stanley",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Morgan.Stanley"
+  },
+  {
+    "node_list": "Barclays.Capital...UBS.Investment.Bank",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Barclays.Capital...UBS.Investment.Bank"
+  },
+  {
+    "node_list": "Barclays.Capital",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Barclays.Capital"
+  },
+  {
+    "node_list": "Mizuho.International...Mizuho.Securities.USA",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Mizuho.International...Mizuho.Securities.USA"
+  },
+  {
+    "node_list": "Wachovia.Securities",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Wachovia.Securities"
+  },
+  {
+    "node_list": "Credit.Suisse",
+    "col": "#87CEEB",
+    "size": 9,
+    "shape": "circle",
+    "title": "Credit.Suisse"
+  },
+  {
+    "node_list": "Goldman.Sachs...Investec.Bank..UK.",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Goldman.Sachs...Investec.Bank..UK."
+  },
+  {
+    "node_list": "Fortis.Securities",
+    "col": "#87CEEB",
+    "size": 6,
+    "shape": "circle",
+    "title": "Fortis.Securities"
+  },
+  {
+    "node_list": "Merrill.Lynch...Terwin.Capital",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Merrill.Lynch...Terwin.Capital"
+  },
+  {
+    "node_list": "Societe.Generale.Corporate...Investment.Banking..London....Terwin.Capital",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Societe.Generale.Corporate...Investment.Banking..London....Terwin.Capital"
+  },
+  {
+    "node_list": "Banc.of.America.Securities",
+    "col": "#87CEEB",
+    "size": 9,
+    "shape": "circle",
+    "title": "Banc.of.America.Securities"
+  },
+  {
+    "node_list": "Bear.Stearns",
+    "col": "#87CEEB",
+    "size": 9,
+    "shape": "circle",
+    "title": "Bear.Stearns"
+  },
+  {
+    "node_list": "JPMorgan",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "JPMorgan"
+  },
+  {
+    "node_list": "Banc.of.America.Securities...SunTrust.Robinson.Humphrey",
+    "col": "#87CEEB",
+    "size": 3,
+    "shape": "circle",
+    "title": "Banc.of.America.Securities...SunTrust.Robinson.Humphrey"
+  },
+  {
+    "node_list": "TABS.2007.7",
+    "col": "#FFFF00",
+    "size": 15,
+    "shape": "triangle",
+    "title": "TABS.2007.7"
+  },
+  {
+    "node_list": "Jupiter.High.Grade.CDO.IV",
+    "col": "#FFFF00",
+    "size": 18,
+    "shape": "triangle",
+    "title": "Jupiter.High.Grade.CDO.IV"
+  },
+  {
+    "node_list": "West.Trade.Funding.CDO.III",
+    "col": "#FFFF00",
+    "size": 21,
+    "shape": "triangle",
+    "title": "West.Trade.Funding.CDO.III"
+  },
+  {
+    "node_list": "Libra.CDO",
+    "col": "#FFFF00",
+    "size": 12,
+    "shape": "triangle",
+    "title": "Libra.CDO"
+  },
+  {
+    "node_list": "Forge.ABS.High.Grade.CDO.I",
+    "col": "#FFFF00",
+    "size": 15,
+    "shape": "triangle",
+    "title": "Forge.ABS.High.Grade.CDO.I"
+  },
+  {
+    "node_list": "Mainsail.CDO.I",
+    "col": "#FFFF00",
+    "size": 12,
+    "shape": "triangle",
+    "title": "Mainsail.CDO.I"
+  },
+  {
+    "node_list": "X888.Tactical.Fund",
+    "col": "#FFFF00",
+    "size": 12,
+    "shape": "triangle",
+    "title": "X888.Tactical.Fund"
+  },
+  {
+    "node_list": "Armitage.ABS.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Armitage.ABS.CDO"
+  },
+  {
+    "node_list": "Vertical.Virgo.2006.1",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Vertical.Virgo.2006.1"
+  },
+  {
+    "node_list": "Carina.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Carina.CDO"
+  },
+  {
+    "node_list": "MKP.Vela.CBO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "MKP.Vela.CBO"
+  },
+  {
+    "node_list": "Corona.Borealis.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Corona.Borealis.CDO"
+  },
+  {
+    "node_list": "Tallships.Funding",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Tallships.Funding"
+  },
+  {
+    "node_list": "Jupiter.High.Grade.CDO.VI",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Jupiter.High.Grade.CDO.VI"
+  },
+  {
+    "node_list": "West.Trade.Funding.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "West.Trade.Funding.CDO.II"
+  },
+  {
+    "node_list": "TABS.2006.6",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "TABS.2006.6"
+  },
+  {
+    "node_list": "West.Trade.Funding.CDO.I",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "West.Trade.Funding.CDO.I"
+  },
+  {
+    "node_list": "Highridge.ABS.CDO.I",
+    "col": "#FFFF00",
+    "size": 12,
+    "shape": "triangle",
+    "title": "Highridge.ABS.CDO.I"
+  },
+  {
+    "node_list": "Cetus.ABS.CDO.2006.3",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Cetus.ABS.CDO.2006.3"
+  },
+  {
+    "node_list": "Wadsworth.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Wadsworth.CDO"
+  },
+  {
+    "node_list": "Class.V.Funding.III",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Class.V.Funding.III"
+  },
+  {
+    "node_list": "Octonion.I.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Octonion.I.CDO"
+  },
+  {
+    "node_list": "Adams.Square.Funding.II",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Adams.Square.Funding.II"
+  },
+  {
+    "node_list": "Mercury.CDO.III",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Mercury.CDO.III"
+  },
+  {
+    "node_list": "GSC.ABS.CDO.2006.2M.LTD",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "GSC.ABS.CDO.2006.2M.LTD"
+  },
+  {
+    "node_list": "Charles.Fort.CDO.I",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Charles.Fort.CDO.I"
+  },
+  {
+    "node_list": "Diversey.Harbor.ABS.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Diversey.Harbor.ABS.CDO"
+  },
+  {
+    "node_list": "Maxim.High.Grade.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Maxim.High.Grade.CDO.II"
+  },
+  {
+    "node_list": "Maxim.High.Grade.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Maxim.High.Grade.CDO.I"
+  },
+  {
+    "node_list": "Pampelonne.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Pampelonne.CDO.II"
+  },
+  {
+    "node_list": "Markov.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Markov.CDO.I"
+  },
+  {
+    "node_list": "ACA.Aquarius.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "ACA.Aquarius.2006.1"
+  },
+  {
+    "node_list": "Draco.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Draco.2007.1"
+  },
+  {
+    "node_list": "Delphinus.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Delphinus.CDO.2007.1"
+  },
+  {
+    "node_list": "Broderick.CDO.2",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Broderick.CDO.2"
+  },
+  {
+    "node_list": "Pyxis.ABS.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Pyxis.ABS.CDO.2007.1"
+  },
+  {
+    "node_list": "Octans.II.CDO",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Octans.II.CDO"
+  },
+  {
+    "node_list": "Orion.2006.2",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Orion.2006.2"
+  },
+  {
+    "node_list": "Vertical.ABS.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Vertical.ABS.CDO.2007.1"
+  },
+  {
+    "node_list": "McKinley.Funding.III",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "McKinley.Funding.III"
+  },
+  {
+    "node_list": "Hout.Bay.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Hout.Bay.2006.1"
+  },
+  {
+    "node_list": "Octans.I.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Octans.I.CDO"
+  },
+  {
+    "node_list": "Buckingham.CDO.III",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Buckingham.CDO.III"
+  },
+  {
+    "node_list": "Clifton.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Clifton.CDO.I"
+  },
+  {
+    "node_list": "Menton.CDO.III",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Menton.CDO.III"
+  },
+  {
+    "node_list": "Tazlina.Funding.CDO.II",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Tazlina.Funding.CDO.II"
+  },
+  {
+    "node_list": "Tourmaline.CDO.III.LTD.",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Tourmaline.CDO.III.LTD."
+  },
+  {
+    "node_list": "ACA.ABS.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "ACA.ABS.2007.1"
+  },
+  {
+    "node_list": "TABS.2006.5",
+    "col": "#FFFF00",
+    "shape": "triangle",
+    "title": "TABS.2006.5"
+  },
+  {
+    "node_list": "Tazlina.Funding.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Tazlina.Funding.CDO.I"
+  },
+  {
+    "node_list": "Millerton.II.High.Grade.ABS.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Millerton.II.High.Grade.ABS.CDO"
+  },
+  {
+    "node_list": "Orion.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Orion.2006.1"
+  },
+  {
+    "node_list": "Kent.Funding.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Kent.Funding.II"
+  },
+  {
+    "node_list": "Silver.Marlin.ABS.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Silver.Marlin.ABS.CDO.I"
+  },
+  {
+    "node_list": "Lincoln.Avenue.ABS.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Lincoln.Avenue.ABS.CDO"
+  },
+  {
+    "node_list": "Brushfield.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Brushfield.CDO.2007.1"
+  },
+  {
+    "node_list": "Nordic.Valley.2007.1.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Nordic.Valley.2007.1.CDO"
+  },
+  {
+    "node_list": "Hartshorne.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Hartshorne.CDO.I"
+  },
+  {
+    "node_list": "Mayflower.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Mayflower.CDO.I"
+  },
+  {
+    "node_list": "Fort.Duquesne.CDO.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Fort.Duquesne.CDO.2006.1"
+  },
+  {
+    "node_list": "Neptune.CDO.IV",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Neptune.CDO.IV"
+  },
+  {
+    "node_list": "ART.CDO.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "ART.CDO.2006.1"
+  },
+  {
+    "node_list": "Tahoma.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Tahoma.CDO"
+  },
+  {
+    "node_list": "Cetus.ABS.CDO.2006.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Cetus.ABS.CDO.2006.1"
+  },
+  {
+    "node_list": "Cetus.ABS.CDO.2006.2",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Cetus.ABS.CDO.2006.2"
+  },
+  {
+    "node_list": "Toro.ABS.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Toro.ABS.CDO.II"
+  },
+  {
+    "node_list": "Cairn.High.Grade.ABS.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Cairn.High.Grade.ABS.CDO.II"
+  },
+  {
+    "node_list": "Stockton.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Stockton.CDO"
+  },
+  {
+    "node_list": "Ansley.Park.ABS.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Ansley.Park.ABS.CDO"
+  },
+  {
+    "node_list": "Independence.VII.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Independence.VII.CDO"
+  },
+  {
+    "node_list": "Diogenes.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Diogenes.CDO.II"
+  },
+  {
+    "node_list": "IXIS.ABS.CDO.3",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "IXIS.ABS.CDO.3"
+  },
+  {
+    "node_list": "Montauk.Point.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Montauk.Point.CDO.II"
+  },
+  {
+    "node_list": "Gulf.Stream...Atlantic.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Gulf.Stream...Atlantic.CDO.2007.1"
+  },
+  {
+    "node_list": "Acacia.CDO.12",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Acacia.CDO.12"
+  },
+  {
+    "node_list": "Cairn.Mezz.ABS.CDO.IV",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Cairn.Mezz.ABS.CDO.IV"
+  },
+  {
+    "node_list": "Longridge.ABS.CDO.II",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Longridge.ABS.CDO.II"
+  },
+  {
+    "node_list": "Longridge.ABS.CDO.I",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Longridge.ABS.CDO.I"
+  },
+  {
+    "node_list": "Furlong.Synthetic.ABS.CDO.2006.1",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "Furlong.Synthetic.ABS.CDO.2006.1"
+  },
+  {
+    "node_list": "TABS.2005.4",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "TABS.2005.4"
+  },
+  {
+    "node_list": "Coldwater.CDO",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Coldwater.CDO"
+  },
+  {
+    "node_list": "Durant.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Durant.CDO.2007.1"
+  },
+  {
+    "node_list": "Port.Jackson.CDO.2007.1",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "Port.Jackson.CDO.2007.1"
+  },
+  {
+    "node_list": "E.Trade.ABS.CDO.V",
+    "col": "#FFFF00",
+    "size": 6,
+    "shape": "triangle",
+    "title": "E.Trade.ABS.CDO.V"
+  },
+  {
+    "node_list": "ZAIS.Investment.Grade.VIII",
+    "col": "#FFFF00",
+    "size": 9,
+    "shape": "triangle",
+    "title": "ZAIS.Investment.Grade.VIII"
+  },
+  {
+    "node_list": "Grand.Avenue.CDO.I",
+    "col": "#FFFF00",
+    "size": 3,
+    "shape": "triangle",
+    "title": "Grand.Avenue.CDO.I"
+  },
+  {
+    "node_list": "South.Coast.Funding.VII",
+    "col": "#FFFF00",
+    "size": 3,
+    "shape": "triangle",
+    "title": "South.Coast.Funding.VII"
+  },
+  {
+    "node_list": "MKP.CBO.V",
+    "col": "#FFFF00",
+    "size": 3,
+    "shape": "triangle",
+    "title": "MKP.CBO.V"
+  }
+]
