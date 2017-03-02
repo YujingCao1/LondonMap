@@ -5,15 +5,35 @@
 	<meta name="viewport" content="initial-scale=1.0">
 	<title>London Map</title>
 	<script src='http://d3js.org/d3.v3.min.js'></script>
+    <script src="js/js/vendor/jquery.js"></script>
     <script src='js/geoxml3.js'></script>
 
 	<link rel="stylesheet" href="LondonMap.css"> 
 </head>
 <body>
-    <div id="controls" class="control_box">
-        <input type="checkbox" id="layer0" onclick="toggleLayer(0)" checked>
+    <div id="controls" class="nicebox">
+        <div>
+            <select id="census-variable">
+                <option value = JOBS_DENSI>Job Density</option>
+                <option value = MedWklyPay>Median Weekly Pay</option>
+                <option value = SQKM>Square Kilometers</option>
+                <option value = MdWrkPlcPa>Median Work Place Pay</option>
+            </select>
+        </div>
+        <div id="legend">
+            <div id="census-min" style="">min</div>
+            <div class="color-key"><span id="data-caret">&#x25c6;</span></div>
+            <div id="census-max">max</div>
+        </div>
+    </div>
+    <div id="data-box", class="nicebox">
+        <label id="data-label" for="data-value"></label>
+        <span id="data-value"></span>
+    </div>
+    <div id="controls1" class="control_box">
+        <input name="dataset" type="checkbox" id="layer0" value="Population">
         Population <br>
-        <input type="checkbox" id="layer1" onclick="toggleLayer(1)" checked>
+        <input name="dataset" type="checkbox" id="layer1" value="Economics">
         Economics
     </div>
 	<div id="map"></div>
@@ -22,39 +42,111 @@
 		var map;
         var marker;
         var layers = [];
+        var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
+        var optionsAttr = document.getElementById('census-variable'); // Show the selected one
+        var layer0_file = document.getElementById('layer0').checked;
+        var layer1_file = document.getElementById('layer1').checked;
+        var json;
+
+        d3.selectAll("input[id=layer0]").on('change', function(){
+            layer1_file = false;
+            layer0_file = true;
+           json = $('input[id=layer0]').val() + ".json";
+
+           myMap();
+        })
+
+        d3.selectAll("input[id=layer1]").on('change', function(){
+            layer1_file = true;
+            layer0_file = false;
+            json = $('input[id=layer1]').val() + ".json";
+            myMap();
+        })
 		// Create a Google Map
-		function myMap() {   
+		function myMap() {
 			var mapCanvas = document.getElementById('map');
 			var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
 			var mapOptions = {
 				center: myCenter,
-				zoom: 13
+				zoom: 10
 			};
 			map = new google.maps.Map(mapCanvas, mapOptions);
 
-            // layers[0] = new geoXML3.parser({map:map, preserveViewport: true});
-            // layers[0].parse('Economics.kml');
-            // layers[1] = new geoXML3.parser({map:map, preserveViewport: true});
-            // layers[1].parse('Economics.kml');
+			// // Hoover to Highlight Selected City
+            map.data.addListener('mouseover', mouseInToRegion);
+            // Remove the Style
+            map.data.addListener('mouseout', mouseOutOfRegion);
+            // Set Up Dropdown
+            google.maps.event.addDomListener(optionsAttr, 'change', function(){
+                clearData();
+                loadData(optionsAttr.options[optionsAttr.selectedIndex].value);
+            });
+            google.maps.event.addDomListener(optionsAttr, 'change', function(){
+                var MinValue;
+                var MaxValue;
+                var attribution = optionsAttr.options[optionsAttr.selectedIndex].value;
+                var attr_value = [];
+                var colorFill = [];
 
-            layers[0] = new google.maps.KmlLayer({
-                url: 'http://dasil.grinnell.edu/visualizations/Data/Economics.kml',
-                map: map
-            })
+                d3.json(json, function(error, json){
+                    data = json;
+                    for (i=0 ; i<json.features.length; i++){
+                        attr_value[i] = json.features[i].properties[attribution];
+                    }
+                    MinValue = d3.min(attr_value);
+                    MaxValue = d3.max(attr_value);
+                });
+                    map.data.setStyle(function(feature){
+                    var low = [5, 69, 54];
+                    var high = [151, 83, 34];
+                    var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                    for (var i = 0; i < 3; i++){
+                        colorFill[i] = (high[i] - low[i]) * delta + low[i];
+                    }
+                    return ({
+                        fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
+                        strokeWeight: 0.2,
+                        fillOpacity: 0.8,
+                        strokeColor: '#fff'
+                    })
+                });
+            });
 
-            layers[1] = new google.maps.KmlLayer({
-                url: 'http://dasil.grinnell.edu/visualizations/Data/Economics.kml',
-                map: map
-            })
-
-            for (var i = 0; i < layers.length; i++){
-                layers[i].setMap(map);
-            }
-			// google.maps.event.addListener(map, 'click', function (event) {
-   //             displayCoordinates(event.latLng);               
-   //          });
+            loadMapShapes();
 		}
+        // Load Map
+        function loadMapShapes(){
+            map.data.loadGeoJson(json);
 
+            google.maps.event.trigger(document.getElementById('census-variable'), 'change');
+        }
+        // Load Data
+        function loadData(d){
+            d3.json(json, function(error, json){
+                data = json;
+                for (var i = 0; i < json.features.length; i++) {
+                    var censusVariable = json.features[i].properties[d];
+                    // Keep Track of Min and Max Values
+                    if (censusVariable < censusMin){
+                        censusMin = censusVariable;
+                    }
+                    if (censusVariable > censusMax){
+                        censusMax = censusVariable;
+                    }
+                    // Update and Display the legend
+                    document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                    document.getElementById('census-min').textContent = censusMin.toLocaleString();
+                }
+            });
+        }
+        // Remove Data
+        function clearData() {
+            censusMin = Number.MAX_VALUE;
+            censusMax = -Number.MAX_VALUE;
+            document.getElementById('data-box').style.display = 'none';
+            document.getElementById('data-caret').style.display = 'none';
+        }
+        
 		// Retrieve Latitudes and Longitudes
         function displayCoordinates(pnt) {
           var lat = pnt.lat();
@@ -63,36 +155,30 @@
           lng = lng.toFixed(4);
           console.log("lat: "+lat+ " lng: "+lng);
         }
-		
-        function processSVData(data, status){
-            if (status === 'OK'){
-                panorama.setPano(data.location.pano);
-                panorama.setPov({
-                    heading: 270,
-                    pitch: 0
-                });
-                panorama.setVisible(true);
 
-                google.maps.event.addListener(marker,'click', function(){
-                    var markerPanoID = data.location.panorama;
-                    panorama.setPano(markerPanoID);
-                    panorama.setPov({
-                        heading: 270,
-                        pitch: 0
-                    });
-                    panorama.setVisible(true);
-                });
+        // Event Mouseover
+        function mouseInToRegion(e){
+            map.data.revertStyle();
+            var variable = optionsAttr.value;
+            var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+            json = $('input[name="dataset"]:checked').val() + ".json";
+          // update the label
+            var name;
+            if (json == 'Population.json'){
+                name = 'COA_Code';
             }else{
-                console.error('Street View data not found for this location');
+                name = 'PROV3NAME';
             }
+            document.getElementById('data-label').textContent = e.feature.getProperty(name);
+            document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+            document.getElementById('data-box').style.display = 'block';
+            document.getElementById('data-caret').style.display = 'block';
+            document.getElementById('data-caret').style.paddingLeft = percent + '%';
+            map.data.overrideStyle(e.feature, {strokeWeight: 3, zIndex: 10})
         }
-
-        function toggleLayer(i){
-            if (layers[i].getMap() === null){
-                layers[i].setMap(map);
-            }else{
-                layers[i].setMap(null);
-            }
+        // Event Mouseout
+        function mouseOutOfRegion(e){
+           map.data.revertStyle();
         }
 
 	</script>
