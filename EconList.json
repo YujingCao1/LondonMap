@@ -1,0 +1,18 @@
+[
+	{
+		"id": "JOBS_DENSI",
+		"name": "Jobs Density"
+	},
+	{
+		"id": "MedWklyPay",
+		"name": "Median Weekly Pay"
+	},
+	{
+		"id": "SQKM",
+		"name": "Square Kilometers"
+	},
+	{
+		"id": "MdWrkPlcPa",
+		"name": "Median Work Place Pay"
+	}
+]
