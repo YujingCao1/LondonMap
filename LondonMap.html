@@ -42,12 +42,14 @@
         var layer0_file = document.getElementById('layer0').checked;
         var layer1_file = document.getElementById('layer1').checked;
         var json;
+        var list = document.getElementById('census-variable');
+
 
         d3.selectAll("input[id=layer0]").on('change', function(){
             layer1_file = false;
             layer0_file = true;
             json = $('input[id=layer0]').val() + ".json";
-            document.getElementsByClassName('dataset').innerHTML = "";
+           removeDropDown();
             var attributionJSON = d3.json('PopList.json',function(json){
                 attributesJSON = json;
                 d3.select("#census-variable").selectAll("option")
@@ -72,7 +74,7 @@
             layer1_file = true;
             layer0_file = false;
             json = $('input[id=layer1]').val() + ".json";
-            document.getElementsByClassName('dataset').innerHTML = "";
+            removeDropDown(); // Try to remove old list, then load new list
             var attributionJSON = d3.json('EconList.json',function(json){
                 attributesJSON = json;
                 d3.select("#census-variable").selectAll("option")
@@ -230,6 +232,15 @@
                         })
 
            })
+        }
+
+        // Remove Options from Dropdown List
+        function removeDropDown(){
+            if (list.options.length > 0){
+                for (var i = list.options.length - 1; i >=0 ;i-- ){
+                    list.remove(i);
+                }
+            }
         }
 
 	</script>
