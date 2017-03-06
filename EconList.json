@@ -1,5 +1,9 @@
 [
 	{
+		"id": "Select An Attribute",
+		"name": "Select An Attribute"
+	},
+	{
 		"id": "JOBS_DENSI",
 		"name": "Jobs Density"
 	},

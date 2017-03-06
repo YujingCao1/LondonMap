@@ -27,20 +27,22 @@
     </div>
     <div id="controls1" class="control_box">
         <input name="dataset" type="checkbox" id="layer0" value="Population">
-        Population <br>
+         Population <br>
         <input name="dataset" type="checkbox" id="layer1" value="Economics">
-        Economics
+         Economics  <br>
+        <input type="checkbox" name="dataset" id="layer2" value="Food">
+         Restaurant
     </div>
 	<div id="map"></div>
 
 	<script type="text/javascript">
 		var map;
         var marker;
-        var layers = [];
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
         var layer0_file = document.getElementById('layer0').checked;
         var layer1_file = document.getElementById('layer1').checked;
+        var layer2_file = document.getElementById('layer2').checked;
         var json;
         var list = document.getElementById('census-variable');
 
@@ -48,8 +50,9 @@
         d3.selectAll("input[id=layer0]").on('change', function(){
             layer1_file = false;
             layer0_file = true;
+            layer2_file = false;
             json = $('input[id=layer0]').val() + ".json";
-           removeDropDown();
+            removeDropDown();
             var attributionJSON = d3.json('PopList.json',function(json){
                 attributesJSON = json;
                 d3.select("#census-variable").selectAll("option")
@@ -73,6 +76,7 @@
         d3.selectAll("input[id=layer1]").on('change', function(){
             layer1_file = true;
             layer0_file = false;
+            layer2_file = false;
             json = $('input[id=layer1]').val() + ".json";
             removeDropDown(); // Try to remove old list, then load new list
             var attributionJSON = d3.json('EconList.json',function(json){
@@ -93,6 +97,32 @@
 
            })
             myMap();
+        })
+
+          d3.selectAll("input[id=layer2]").on('change', function(){
+            layer1_file = false;
+            layer0_file = false;
+            layer2_file = true;
+            json = $('input[id=layer2]').val() + ".json";
+            removeDropDown(); // Try to remove old list, then load new list
+            var attributionJSON = d3.json('EconList.json',function(json){
+                attributesJSON = json;
+                d3.select("#census-variable").selectAll("option")
+                        .data(attributesJSON)
+                        .enter()
+                        .append("option")
+                        .attr("id", function(d,i) {
+                            return ("option" + i)
+                        })
+                        .text(function(d) {
+                            return d.name;
+                        })
+                        .attr("value", function(d){
+                            return d.id;
+                        })
+
+           })
+            setMarkers();
         })
 
 		// Create a Google Map
@@ -137,11 +167,23 @@
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
+
+                    var showRow = true;
+                    if (feature.getProperty(attribution) == null || isNaN(feature.getProperty(attribution))){
+                        showRow = false;
+                    }
+
+                    var outlineWeight = 0.5, zIndex = 1;
+                    if (feature.getProperty('state') === 'hover'){
+                        outlineWeight = zIndex =2;
+                    }
                     return ({
                         fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
-                        strokeWeight: 0.2,
-                        fillOpacity: 0.8,
-                        strokeColor: '#fff'
+                        strokeWeight: outlineWeight,
+                        fillOpacity: 0.75,
+                        strokeColor: '#fff',
+                        zIndex: zIndex,
+                        visible: showRow
                     })
                 });
             });
@@ -191,7 +233,8 @@
 
         // Event Mouseover
         function mouseInToRegion(e){
-            map.data.revertStyle();
+           e.feature.setProperty('state', 'hover');
+
             var variable = optionsAttr.value;
             var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
           // update the label
@@ -206,11 +249,11 @@
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
-            map.data.overrideStyle(e.feature, {strokeWeight: 3, zIndex: 10})
         }
         // Event Mouseout
         function mouseOutOfRegion(e){
-           map.data.revertStyle();
+           //map.data.revertStyle();
+           e.feature.setProperty('state', 'normal');
         }
 
         // Load Dropdown List
@@ -240,6 +283,90 @@
                 for (var i = list.options.length - 1; i >=0 ;i-- ){
                     list.remove(i);
                 }
+            }
+        }
+
+        // Import Restaurant Markers
+        function setMarkers(){
+            var json = "LondonFood.json";
+            var London = {lat:51.5074, lng:-0.1272};
+            var mapCanvas = document.getElementById('map');
+            var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
+            var mapOptions = {
+                center: myCenter,
+                zoom: 13
+            };
+            map = new google.maps.Map(mapCanvas, mapOptions);
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            // Add Markers to Denote the Buildings
+            d3.json(json, function(error, json){
+                data = json;
+                
+                for (i = 0; i<json.length; i++){
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(json[i].Latitude, json[i].Longitude),
+                        map: map,
+                        title: json[i].BusinessName,
+                        /*icon: 'restaurant.jpg'*/
+                    });
+
+                    google.maps.event.addListener(marker, 'click', (function(marker,i){
+                        return function(){
+                            infoWindow.setContent("<div style = 'height: 100px; width: 200px; font-size: 12px'>" 
+                                     + "<strong>" + json[i].BusinessName + "</strong>"
+                                     + "<br>" + json[i].BusinessType + "<br>"
+                                     + "Address: " + json[i].AddressLine1   + ", " + json[i].AddressLine2 + ", " + json[i].AddressLine3 + ", " + json[i].AddressLine4 + ", " +json[i].PostCode
+                                     + "<br>" + "Rating Value: " + json[i].RatingValue
+                                     + "<br>" + "Hygiene Rate: " + json[i].Hygiene)
+                                     + "</div>";
+                            infoWindow.open(map,marker);
+
+                        }
+                    })(marker,i));
+                }
+            });
+
+            // Click on Markers to show the Info
+
+            d3.json(json, function(error,json){
+                data = json;
+
+                for (i = 0; i<json.length; i++){
+                    infoWindow = new google.maps.InfoWindow({
+                        content: + "<strong>" + json[i].BusinessName + "</strong>"
+                                     + "<br>" + json[i].BusinessType
+                                     + "Address: " + json[i].AddressLine1   + ", " + json[i].AddressLine2 + ", " + json[i].AddressLine3 + ", " + json[i].AddressLine4 + ", " +json[i].PostCode
+                                     + "<br>" + "Rating Value: " + json[i].RatingValue
+                                     + "<br>" + "Hygiene Rate: " + json[i].Hygiene
+                    }); 
+                }
+            });
+
+            
+        }
+
+        function processSVData(data, status){
+            if (status === 'OK'){
+                panorama.setPano(data.location.pano);
+                panorama.setPov({
+                    heading: 270,
+                    pitch: 0
+                });
+                panorama.setVisible(true);
+
+                google.maps.event.addListener(marker,'click', function(){
+                    var markerPanoID = data.location.panorama;
+                    panorama.setPano(markerPanoID);
+                    panorama.setPov({
+                        heading: 270,
+                        pitch: 0
+                    });
+                    panorama.setVisible(true);
+                });
+            }else{
+                console.error('Street View data not found for this location');
             }
         }
 
