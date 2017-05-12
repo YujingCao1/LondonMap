@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+		<script src="https://d3js.org/d3.v3.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="Map.css">
+</head>
+
+	<body>
+		<div id = "dropDown">
+			<select id="dataset">
+				<option id="data_1" title="Economics Characteristiscs">Economics</option>
+				<option id="data_2" title="Population Characteristiscs">Population</option>
+			</select>
+			<select id = "attribute" onChange="changeAttr(this.options[this.selectedIndex].innerHTML)"></select>
+		</div>
+		<div id="map"></div>
+		<div id="tooltip"></div>
+		<script>
+
+		var w = window.innerWidth/2;
+		var h = window.innerHeight/2;
+		var base_color = d3.scale.category20();
+		var variableName, clicking = 0;
+		var dataset  = d3.select("#dataset").node().value;
+		console.log(dataset);
+
+		// Make drop down list
+
+		var attributesJSON=d3.json('JSON/List/' + dataset + '.json',function(json){
+				attributesJSON=json;
+				d3.select("#attribute").selectAll("option")
+									.data(attributesJSON)
+									.enter()
+									.append("option")
+									.attr("id", function(d,i) {
+										return ("option" + i)
+									})
+									.text(function(d) {
+										if (d.name!="Unknown"){
+											return d.name;
+										}else{
+											return d.id;
+										}
+									})
+									.attr("title",function(d){
+										return d.name;
+									});
+			});
+		/*
+		function load(){
+			d3.json("JSON/Economics.json", function(error, data){
+
+				if(error) console.log("error fetching data");
+
+				var group = svg.selectAll("g")
+					.data(data.features)
+					.enter()
+					.append("g");
+
+				var projection = d3.geo.mercator()
+					.scale([15000])
+					.center(d3.geo.centroid(data));
+
+				var path = d3.geo.path().projection(projection);
+
+				var areas = group.append("path")
+					.attr("d",path)
+					.attr("class", "area")
+					.style("fill", function(d,i){
+						return base_color(i)
+					})
+					.style("fill-opacity", 0.8)
+					.style("stroke", "rgba(5, 4, 4, 0.2)")
+			});
+    	}
+    	*/
+
+		// Change Attribute
+		function changeAttr(sel){
+
+			d3.selectAll("#map").transition().remove();
+
+			d3.json('JSON/' + dataset + '.json', function(error, data){
+
+				if(error) console.log("error fetching data");
+
+				// Get the selected value of the dropdown list
+				var sel = d3.select("#attribute").node().value;
+					
+					variableName = attributeName(sel);
+					
+					console.log(sel + " " + variableName)
+
+				var attrValue = []; // store all the values of selected attribute.
+
+				for (var i = 0; i < data.features.length; i++){
+					attrValue[i] = data.features[i].properties[variableName];
+				}
+
+
+				var attrMax = d3.max(attrValue);
+				var attrMin = d3.min(attrValue);
+
+				var colorScale = d3.scale.quantile()
+					.range(['#94bfac', '#5b9291', '#3b6879', '#264d7e', '#1f3057', '#2a283d'])
+					.domain([attrMin, attrMax])
+
+				// Draw London Map
+				var svg = d3.select("body").append("svg")
+					.attr("id", "map")
+					.attr("width", w)
+					.attr("height",h);
+
+				var group = svg.selectAll("g")
+					.data(data.features)
+					.enter()
+					.append("g");
+
+				var projection = d3.geo.mercator()
+					.scale([40000])
+					.center(d3.geo.centroid(data));
+
+				var path = d3.geo.path().projection(projection);
+				var tooltipDiv = document.getElementById('tooltip');
+
+				var areas = group.append("path")
+					.attr("d",path)
+					.attr("class", "area")
+					.style("fill", function(d){
+						return colorScale(d.properties[variableName])
+					})
+					.style("fill-opacity", 0.8)
+					.style("stroke", "rgba(5, 4, 4, 0.6)")
+					.on("click", function(d){
+						var currentDistrict = this;
+						if (clicking == 0){
+							d3.select(this).style("fill-opacity", 1) // Highlight selected area
+								.style("stroke", "rgba(5, 4, 4, 1)");
+
+ 								tooltipDiv.style.display = "block"; // Show tooltip
+								tooltipDiv.innerHTML = 
+								"District Name: " + d.properties.PROV3NAME + "<br/>" + 
+								sel + ": " + d.properties[variableName] + "<br/>"
+
+							clicking = 1;
+						}else{
+							d3.selectAll("path").style("fill-opacity",0.8)
+							.style("stroke", "rgba(5, 4, 4, 0.6)");
+
+							tooltipDiv.style.display = "none"; // hide tooltip
+							clicking = 0;
+
+						}
+					});
+			});
+		}
+
+		// Get District Name
+		function districtName(d){
+			return d && d.properties? d.properties.PROV3NAME:null;
+		}
+
+		function attributeName(val){
+			attributesJSON.forEach(function(d){
+				if (d.name == val){
+					return variableName = d.abs;
+				}
+			})
+			return variableName
+		}
+			
+		</script>
+	</body>
+</html>
