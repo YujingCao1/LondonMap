@@ -70,6 +70,7 @@
                         })
 
            });
+           document.getElementById('controls').style.visibility = "visible";
            myMap();
         })
 
@@ -96,6 +97,7 @@
                         })
 
            })
+            document.getElementById('controls').style.visibility = "visible";
             myMap();
         })
 
@@ -229,12 +231,13 @@
                     }
 
                     if (layer0_file){
-                        if (selectedAttr != "2001POP"){
+                        if (selectedAttr == "2001POP"){
                             document.getElementById('census-max').textContent = censusMax.toLocaleString();
                             document.getElementById('census-min').textContent = censusMin.toLocaleString();
                         }else{
                             document.getElementById('census-max').textContent = (censusMax/json.features[i].properties["2001POP"]*100).toLocaleString();
                             document.getElementById('census-min').textContent = (censusMin/json.features[i].properties["2001POP"]*100).toLocaleString();
+                            console.log(document.getElementById('census-max').textContent)
                         }
                     } 
                 }
@@ -272,14 +275,20 @@
             }
             document.getElementById('data-label').textContent = e.feature.getProperty(name);
 
-            if (variable == "JOBS_DENSI"){
-                document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
-            }else{
+            if (layer1_file){
+                if (variable == "JOBS_DENSI"){
+                    document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
+                }else{
+                    document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+                }  
+            }
+
+            console.log(layer0_file);
+            if (layer0_file) {
                 if (variable == "2001POP"){
                     document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }else{
                     document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString();
-
                 }
             }
             document.getElementById('data-box').style.display = 'block';
