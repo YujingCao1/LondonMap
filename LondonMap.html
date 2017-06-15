@@ -104,24 +104,25 @@
             layer0_file = false;
             layer2_file = true;
             json = $('input[id=layer2]').val() + ".json";
-            removeDropDown(); // Try to remove old list, then load new list
-            var attributionJSON = d3.json('EconList.json',function(json){
-                attributesJSON = json;
-                d3.select("#census-variable").selectAll("option")
-                        .data(attributesJSON)
-                        .enter()
-                        .append("option")
-                        .attr("id", function(d,i) {
-                            return ("option" + i)
-                        })
-                        .text(function(d) {
-                            return d.name;
-                        })
-                        .attr("value", function(d){
-                            return d.id;
-                        })
+           //  removeDropDown(); // Try to remove old list, then load new list
+           //  var attributionJSON = d3.json('EconList.json',function(json){
+           //      attributesJSON = json;
+           //      d3.select("#census-variable").selectAll("option")
+           //              .data(attributesJSON)
+           //              .enter()
+           //              .append("option")
+           //              .attr("id", function(d,i) {
+           //                  return ("option" + i)
+           //              })
+           //              .text(function(d) {
+           //                  return d.name;
+           //              })
+           //              .attr("value", function(d){
+           //                  return d.id;
+           //              })
 
-           })
+           // })  
+           document.getElementById('controls').style.visibility = "hidden";
             setMarkers();
         })
 
@@ -136,7 +137,7 @@
 
 			map = new google.maps.Map(mapCanvas, mapOptions);
 
-			// // Hoover to Highlight Selected City
+			// // Hover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
             map.data.addListener('mouseout', mouseOutOfRegion);
@@ -148,22 +149,29 @@
             google.maps.event.addDomListener(optionsAttr, 'change', function(){
                 var MinValue;
                 var MaxValue;
-                var attribution = optionsAttr.options[optionsAttr.selectedIndex].value;
+                var attribution = optionsAttr.options[optionsAttr.selectedIndex].value; // Return attribute name
                 var attr_value = [];
                 var colorFill = [];
                 
                 d3.json(json, function(error, json){
                     data = json;
+
                     for (i=0 ; i<json.features.length; i++){
                         attr_value[i] = json.features[i].properties[attribution];
                     }
-                    MinValue = d3.min(attr_value);
-                    MaxValue = d3.max(attr_value);
+                
+                    MinValue = attribution == "JOBS_DENSI"? Math.log(d3.min(attr_value)): d3.min(attr_value);
+                    MaxValue = attribution == "JOBS_DENSI"? Math.log(d3.max(attr_value)): d3.max(attr_value);
                 });
                     map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
-                    var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                    if (attribution == "JOBS_DENSI"){
+                        var delta = (Math.log(feature.getProperty(attribution)) - MinValue)/ (MaxValue - MinValue);
+                    }else{
+                        var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+
+                    }
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
@@ -180,7 +188,7 @@
                     return ({
                         fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
                         strokeWeight: outlineWeight,
-                        fillOpacity: 0.75,
+                        fillOpacity: 0.9,
                         strokeColor: '#fff',
                         zIndex: zIndex,
                         visible: showRow
@@ -197,6 +205,7 @@
         }
         // Load Data
         function loadData(json, d){
+            var selectedAttr = optionsAttr.options[optionsAttr.selectedIndex].value
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
@@ -209,8 +218,25 @@
                         censusMax = censusVariable;
                     }
                     // Update and Display the legend
-                    document.getElementById('census-max').textContent = censusMax.toLocaleString();
-                    document.getElementById('census-min').textContent = censusMin.toLocaleString();
+                    if (layer1_file){
+                        if (selectedAttr == "JOBS_DENSI") {
+                            document.getElementById('census-max').textContent = Math.log(censusMax).toLocaleString();
+                            document.getElementById('census-min').textContent = Math.log(censusMin).toLocaleString();
+                        }else{
+                            document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                            document.getElementById('census-min').textContent = censusMin.toLocaleString(); 
+                        }
+                    }
+
+                    if (layer0_file){
+                        if (selectedAttr != "2001POP"){
+                            document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                            document.getElementById('census-min').textContent = censusMin.toLocaleString();
+                        }else{
+                            document.getElementById('census-max').textContent = (censusMax/json.features[i].properties["2001POP"]*100).toLocaleString();
+                            document.getElementById('census-min').textContent = (censusMin/json.features[i].properties["2001POP"]*100).toLocaleString();
+                        }
+                    } 
                 }
             });
         }
@@ -245,7 +271,17 @@
                 name = 'PROV3NAME';
             }
             document.getElementById('data-label').textContent = e.feature.getProperty(name);
-            document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+
+            if (variable == "JOBS_DENSI"){
+                document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
+            }else{
+                if (variable == "2001POP"){
+                    document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+                }else{
+                    document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString();
+
+                }
+            }
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
