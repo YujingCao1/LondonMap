@@ -34,6 +34,7 @@
          Restaurant
     </div>
 	<div id="map"></div>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
 
 	<script type="text/javascript">
 		var map;
@@ -199,7 +200,6 @@
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
-
                     var showRow = true;
                     if (feature.getProperty(attribution) == null || isNaN(feature.getProperty(attribution))){
                         showRow = false;
@@ -220,13 +220,73 @@
                 });
             });
 
+            // Create the search box and link it to the UI element
+            var input = document.getElementById('pac-input');
+            var searchBox= new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+
+            // Bias the SearchBox results towards current map's viewport.
+            map.addListener('bounds_changed', function(){
+                searchBox.setBounds(map.getBounds());
+            });
+
+            var markers = [];
+            searchBox.addListener('places_changed', function(){
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0){
+                    return;
+                }
+
+                //Clear out the old markers.
+                markers.forEach(function(marker){
+                    marker.setMap(null);
+                });
+
+                markers = [];
+
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place){
+                    if(!place.geometry){
+                        console.log("Return place contains no geometry");
+                        return;
+                    }
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    };
+
+                    // Create a marker for each place.
+                    markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: icon,
+                        title:place.name,
+                        positon:place.geometry.location
+                    }));
+
+                    if (place.geometry.viewport){
+                        // Only geocodes have viewport
+                        bounds.union(place.geometry.viewport);
+                    }else{
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
+
             loadMapShapes();
 		}
+
         // Load Map
         function loadMapShapes(){
             map.data.loadGeoJson(json);
             google.maps.event.trigger(document.getElementById('census-variable'), 'change');
         }
+
         // Load Data
         function loadData(json, d){
             d3.json(json, function(error, json){
@@ -255,12 +315,24 @@
                         censusMax = censusVariable;
                     }
                     // Update and Display the legend
-                    
-                    document.getElementById('census-max').textContent = censusMax.toLocaleString() + '%';
-                    document.getElementById('census-min').textContent = censusMin.toLocaleString() + '%'; 
+                    if (layer0_file){
+                        if (d != "2001POP"){
+                            document.getElementById('census-max').textContent = censusMax.toLocaleString() + '%';
+                            document.getElementById('census-min').textContent = censusMin.toLocaleString() + '%'; 
+                        }else{
+                            document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                            document.getElementById('census-min').textContent = censusMin.toLocaleString(); 
+                        }
+                    }
+
+                    if (layer1_file){
+                        document.getElementById('census-max').textContent = censusMax.toLocaleString();
+                        document.getElementById('census-min').textContent = censusMin.toLocaleString();
+                    }
                 }
             });
         }
+
         // Remove Data
         function clearData() {
             censusMin = Number.MAX_VALUE;
@@ -283,7 +355,21 @@
            e.feature.setProperty('state', 'hover');
 
             var variable = optionsAttr.value;
-            var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+            if (layer1_file){
+                if (variable != "2001POP"){
+                    var percent = ((e.feature.getProperty(variable)/e.feature.getProperty("2001POP") * 100) - censusMin) /(censusMax - censusMin) * 100;
+                }else{
+                    var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+                }
+            }
+
+            if (layer0_file){
+                if (variable == "JOBS_DENSI"){
+                    var percent = (Math.log(e.feature.getProperty(variable)) - censusMin)/(censusMax - censusMin) * 100;
+                }else{
+                    var percent = (e.feature.getProperty(variable) - censusMin)/(censusMax - censusMin) * 100;           
+                }
+            }
           // update the label
             var name;
             if (json == 'Population.json'){
@@ -311,6 +397,7 @@
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
         }
+
         // Event Mouseout
         function mouseOutOfRegion(e){
            //map.data.revertStyle();
@@ -432,6 +519,6 @@
         }
 
 	</script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&libraries=places&callback=myMap" async defer></script>
 </body>
 </html>
