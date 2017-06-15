@@ -35,7 +35,6 @@
     </div>
 	<div id="map"></div>
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-
 	<script type="text/javascript">
 		var map;
         var marker;
@@ -126,7 +125,7 @@
 
            // })  
            document.getElementById('controls').style.visibility = "hidden";
-            setMarkers();
+           setMarkers();
         })
 
 		// Create a Google Map
@@ -221,8 +220,79 @@
             });
 
             // Create the search box and link it to the UI element
+            // var input = document.getElementById('pac-input');
+            // var searchBox = new google.maps.places.SearchBox(input);
+            // map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+
+            // // Bias the SearchBox results towards current map's viewport.
+            // map.addListener('bounds_changed', function(){
+            //     searchBox.setBounds(map.getBounds());
+            // });
+
+            // var markers = [];
+            // searchBox.addListener('places_changed', function(){
+            //     var places = searchBox.getPlaces();
+
+            //     if (places.length == 0){
+            //         return;
+            //     }
+
+            //     //Clear out the old markers.
+            //     markers.forEach(function(marker){
+            //         marker.setMap(null);
+            //     });
+
+            //     markers = [];
+
+            //     // For each place, get the icon, name and location.
+            //     var bounds = new google.maps.LatLngBounds();
+            //     places.forEach(function(place){
+            //         if(!place.geometry){
+            //             console.log("Return place contains no geometry");
+            //             return;
+            //         }
+            //         var icon = {
+            //             url: place.icon,
+            //             size: new google.maps.Size(71, 71),
+            //             origin: new google.maps.Point(0, 0),
+            //             anchor: new google.maps.Point(17, 34),
+            //             scaledSize: new google.maps.Size(25, 25)
+            //         };
+
+            //         // Create a marker for each place.
+            //         markers.push(new google.maps.Marker({
+            //             map: map,
+            //             icon: icon,
+            //             title:place.name,
+            //             positon:place.geometry.location
+            //         }));
+
+            //         if (place.geometry.viewport){
+            //             // Only geocodes have viewport
+            //             bounds.union(place.geometry.viewport);
+            //         }else{
+            //             bounds.extend(place.geometry.location);
+            //         }
+            //     });
+            //     map.fitBounds(bounds);
+            // });
+
+            loadMapShapes();
+		}
+
+        // Autocomplete
+        function initAutocomplete(){
+            var mapCanvas = document.getElementById('map');
+            var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
+            var mapOptions = {
+                center: myCenter,
+                zoom: 10
+            };
+
+            map = new google.maps.Map(mapCanvas, mapOptions);
+            // Create the search box and link it to the UI element
             var input = document.getElementById('pac-input');
-            var searchBox= new google.maps.places.SearchBox(input);
+            var searchBox = new google.maps.places.SearchBox(input);
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
 
             // Bias the SearchBox results towards current map's viewport.
@@ -277,9 +347,7 @@
                 });
                 map.fitBounds(bounds);
             });
-
-            loadMapShapes();
-		}
+        }
 
         // Load Map
         function loadMapShapes(){
@@ -355,26 +423,22 @@
            e.feature.setProperty('state', 'hover');
 
             var variable = optionsAttr.value;
-            if (layer1_file){
+          // update the label
+            var name;
+            if (json == 'Population.json'){
+                name = 'COA_Code';
                 if (variable != "2001POP"){
                     var percent = ((e.feature.getProperty(variable)/e.feature.getProperty("2001POP") * 100) - censusMin) /(censusMax - censusMin) * 100;
                 }else{
                     var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
                 }
-            }
-
-            if (layer0_file){
-                if (variable == "JOBS_DENSI"){
-                    var percent = (Math.log(e.feature.getProperty(variable)) - censusMin)/(censusMax - censusMin) * 100;
-                }else{
-                    var percent = (e.feature.getProperty(variable) - censusMin)/(censusMax - censusMin) * 100;           
-                }
-            }
-          // update the label
-            var name;
-            if (json == 'Population.json'){
-                name = 'COA_Code';
             }else{
+                if (variable == "JOBS_DENSI"){
+                    var percent = (Math.log(e.feature.getProperty(variable)) - censusMin) /(censusMax - censusMin) * 100;
+
+                }else{
+                    var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+                }
                 name = 'PROV3NAME';
             }
             document.getElementById('data-label').textContent = e.feature.getProperty(name);
@@ -442,7 +506,7 @@
             var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
             var mapOptions = {
                 center: myCenter,
-                zoom: 13
+                zoom: 10
             };
             map = new google.maps.Map(mapCanvas, mapOptions);
 
@@ -491,8 +555,6 @@
                     }); 
                 }
             });
-
-            
         }
 
         function processSVData(data, status){
