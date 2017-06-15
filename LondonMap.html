@@ -157,10 +157,23 @@
                 
                 d3.json(json, function(error, json){
                     data = json;
-
+                if (layer1_file){
                     for (i=0 ; i<json.features.length; i++){
                         attr_value[i] = json.features[i].properties[attribution];
+                    } 
+                }
+
+                if (layer0_file){
+                    if (attribution != "2001POP") {  
+                        for (i=0 ; i<json.features.length; i++){
+                            attr_value[i] = json.features[i].properties[attribution]/json.features[i].properties["2001POP"]*100;
+                        }
+                    }else{   
+                        for (i=0 ; i<json.features.length; i++){
+                            attr_value[i] = json.features[i].properties[attribution];
+                        }
                     }
+                }
                 
                     MinValue = attribution == "JOBS_DENSI"? Math.log(d3.min(attr_value)): d3.min(attr_value);
                     MaxValue = attribution == "JOBS_DENSI"? Math.log(d3.max(attr_value)): d3.max(attr_value);
@@ -168,11 +181,20 @@
                     map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
-                    if (attribution == "JOBS_DENSI"){
-                        var delta = (Math.log(feature.getProperty(attribution)) - MinValue)/ (MaxValue - MinValue);
-                    }else{
-                        var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
 
+                    if (layer1_file){
+                        if (attribution == "JOBS_DENSI"){
+                            var delta = (Math.log(feature.getProperty(attribution)) - MinValue)/ (MaxValue - MinValue);
+                        } 
+                    }
+                    
+                    if (layer0_file){
+                        if (attribution != "2001POP"){
+                            var delta = ((feature.getProperty(attribution)/feature.getProperty("2001POP") * 100) - MinValue)/ (MaxValue - MinValue);
+
+                        }else{
+                            var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                        }
                     }
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
@@ -207,11 +229,24 @@
         }
         // Load Data
         function loadData(json, d){
-            var selectedAttr = optionsAttr.options[optionsAttr.selectedIndex].value
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
-                    var censusVariable = json.features[i].properties[d];
+                    if (layer1_file){
+                        if (d == "JOBS_DENSI"){
+                            var censusVariable = Math.log(json.features[i].properties[d]);
+                        }else{
+                            var censusVariable = json.features[i].properties[d];
+                        }
+                    }
+
+                    if (layer0_file){
+                        if (d != "2001POP"){
+                            var censusVariable = json.features[i].properties[d]/json.features[i].properties["2001POP"] * 100;
+                        }else{
+                            var censusVariable = json.features[i].properties[d];
+                        }
+                    }
                     // Keep Track of Min and Max Values
                     if (censusVariable < censusMin){
                         censusMin = censusVariable;
@@ -220,26 +255,9 @@
                         censusMax = censusVariable;
                     }
                     // Update and Display the legend
-                    if (layer1_file){
-                        if (selectedAttr == "JOBS_DENSI") {
-                            document.getElementById('census-max').textContent = Math.log(censusMax).toLocaleString();
-                            document.getElementById('census-min').textContent = Math.log(censusMin).toLocaleString();
-                        }else{
-                            document.getElementById('census-max').textContent = censusMax.toLocaleString();
-                            document.getElementById('census-min').textContent = censusMin.toLocaleString(); 
-                        }
-                    }
-
-                    if (layer0_file){
-                        if (selectedAttr == "2001POP"){
-                            document.getElementById('census-max').textContent = censusMax.toLocaleString();
-                            document.getElementById('census-min').textContent = censusMin.toLocaleString();
-                        }else{
-                            document.getElementById('census-max').textContent = (censusMax/json.features[i].properties["2001POP"]*100).toLocaleString();
-                            document.getElementById('census-min').textContent = (censusMin/json.features[i].properties["2001POP"]*100).toLocaleString();
-                            console.log(document.getElementById('census-max').textContent)
-                        }
-                    } 
+                    
+                    document.getElementById('census-max').textContent = censusMax.toLocaleString() + '%';
+                    document.getElementById('census-min').textContent = censusMin.toLocaleString() + '%'; 
                 }
             });
         }
@@ -282,13 +300,11 @@
                     document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }  
             }
-
-            console.log(layer0_file);
             if (layer0_file) {
                 if (variable == "2001POP"){
                     document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }else{
-                    document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString();
+                    document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString() + '%';
                 }
             }
             document.getElementById('data-box').style.display = 'block';
