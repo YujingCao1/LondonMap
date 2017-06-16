@@ -31,6 +31,7 @@
         <span id="data-value"></span>
     </div>
     <div id="map"></div>
+     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <script type="text/javascript">
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
@@ -96,7 +97,7 @@
             });
 
             
-            // Hoover to Highlight Selected City
+            // Hover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
             map.data.addListener('mouseout', mouseOutOfRegion);
@@ -119,7 +120,6 @@
                     }
                     MinValue = d3.min(attr_value);
                     MaxValue = d3.max(attr_value);
-                });
                     map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
@@ -133,12 +133,63 @@
                         fillOpacity: 0.8,
                         strokeColor: '#fff'
                     })
-                });
-            })
+                });           
+            });
+        })
             // Get Lat and Lng
             google.maps.event.addListener(map, 'click', function (event) {
                    displayCoordinates(event.latLng);               
                 });
+
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+            // Bias the SearchBox results towards current map's viewport.
+            map.addListener('bounds_changed', function(){
+                searchBox.setBounds(map.getBounds());
+            });
+            var markers = [];
+            google.maps.event.addListener(searchBox, 'places_changed', function(){
+                var places = searchBox.getPlaces();
+                if (places.length == 0){
+                    return;
+                }
+                //Clear out the old markers.
+                markers.forEach(function(marker){
+                    marker.setMap(null);
+                });
+                markers = [];
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place){
+                    if(!place.geometry){
+                        console.log("Return place contains no geometry");
+                        return;
+                    }
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    };
+                    // Create a marker for each place.
+                    markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: icon,
+                        title:place.name,
+                        positon:place.geometry.location
+                    }));
+                    if (place.geometry.viewport){
+                        // Only geocodes have viewport
+                        bounds.union(place.geometry.viewport);
+                    }else{
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
             // Load the Map
             loadMapShapes();
         }
@@ -201,6 +252,6 @@
            map.data.revertStyle();
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&&libraries=places&callback=myMap"></script>
 </body>
 </html>
