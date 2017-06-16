@@ -22,8 +22,8 @@
         </div>
     </div>
     <div id="data-box", class="nicebox">
-        <label id="data-label" for="data-value"></label>
-        <span id="data-value"></span>
+        <!-- <label id="data-label" for="data-value"></label>
+        <span id="data-value"></span> -->
     </div>
     <div id="controls1" class="control_box">
         <input name="dataset" type="checkbox" id="layer0" value="Population">
@@ -39,12 +39,15 @@
         var map;
         var marker;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
-        var optionsAttr = document.getElementById('census-variable'); // Show the selected one
+        var optionsAttr = list = document.getElementById('census-variable'); // Show the selected one
         var layer0_file = document.getElementById('layer0').checked;
         var layer1_file = document.getElementById('layer1').checked;
         var layer2_file = document.getElementById('layer2').checked;
         var json;
-        var list = document.getElementById('census-variable');
+        var dataBox = document.getElementById('data-box');
+        var formatDecimal = d3.format(".2f"), 
+            formatPercent = d3.format(".2%");
+
         d3.selectAll("input[id=layer0]").on('change', function(){
             layer1_file = false;
             layer0_file = true;
@@ -287,9 +290,6 @@
                         censusMax = censusVariable;
                     }
                 }
-
-                console.log("json: ", json);
-                console.log("d: ", d)
                     // Update and Display the legend
                     if (json == "Population.json"){
                         if (d != "2001POP"){
@@ -328,26 +328,50 @@
             var variable = optionsAttr.value;
           // update the label
             var name;
+
+            var sel = optionsAttr.options[optionsAttr.selectedIndex].text;
+
             if (json == 'Population.json'){
                 name = 'COA_Code';
                 if (variable != "2001POP"){
                     var percent = ((e.feature.getProperty(variable)/e.feature.getProperty("2001POP") * 100) - censusMin) /(censusMax - censusMin) * 100;
-                    document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString() + '%';
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable) + "<br/>" + 
+                                    "<strong>" + "Percentage"  + "</strong>" + ": " + formatPercent(e.feature.getProperty(variable)/e.feature.getProperty("2001POP")) + "<br/>"
+
+                    // document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString() + '%';
                 }else{
                     var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
-                    document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty("2001POP");
+
+                    //document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }
             }else{
                 if (variable == "JOBS_DENSI"){
                     var percent = (Math.log(e.feature.getProperty(variable)) - censusMin) /(censusMax - censusMin) * 100;
-                    document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "District Name" + "</strong>" + ": " + e.feature.getProperty('PROV3NAME') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>" + 
+                                    "<strong>" + sel + " in log scale" + "</strong>" + ": " + Math.log(e.feature.getProperty(variable)).toFixed(2) + "<br/>"
+
+                    // document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
                 }else{
                     var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
-                    document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "District Name" + "</strong>" + ": " + e.feature.getProperty('PROV3NAME') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>"
+                   // document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }
                 name = 'PROV3NAME';
             }
-            document.getElementById('data-label').textContent = e.feature.getProperty(name);
+            //document.getElementById('data-label').textContent = e.feature.getProperty(name);
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
