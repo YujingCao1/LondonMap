@@ -43,7 +43,7 @@
         var layer0_file = document.getElementById('layer0').checked;
         var layer1_file = document.getElementById('layer1').checked;
         var layer2_file = document.getElementById('layer2').checked;
-        var json, currentZoom = 0;
+        var json, currentCenter, currentZoom = 0;
         var dataBox = document.getElementById('data-box');
         var formatDecimal = d3.format(".2f"), 
             formatPercent = d3.format(".2%");
@@ -112,14 +112,25 @@
         function myMap() {
             console.log("currentZoom: " + currentZoom)
             var mapCanvas = document.getElementById('map');
-            var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
+            var myCenter  =  currentCenter != undefined? currentCenter: {lat: 51.5074, lng: -0.1272};
             var zoomLevel = currentZoom != 0? currentZoom : 10;
             var mapOptions = {
                 center: myCenter,
                 zoom: zoomLevel
             };
+
             map = new google.maps.Map(mapCanvas, mapOptions);
+            
             loadMapShapes();
+
+            map.data.addListener('click', function(event){
+                marker = new google.maps.Marker({
+                    position: event.latLng,
+                    map:map
+                });
+                map.setCenter(marker.getPosition());
+                currentCenter = {lat: marker.position.lat(), lng: marker.position.lng()};
+            })
             // // Hover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
@@ -269,6 +280,19 @@
                 currentZoom = map.getZoom();
                 console.log('currentZoom: ' + currentZoom);
             });
+
+            google.maps.event.addListener(map, 'click', function (event) {
+               displayCoordinates(event.latLng);               
+            });
+            
+        }
+
+        // Click to place a marker
+        function placeMarker(location){
+            var marker = new google.maps.Marker({
+                position: location,
+                map:map
+            });
         }
         // Load Data
         function loadData(data, d){
@@ -325,6 +349,7 @@
           lat = lat.toFixed(4);
           var lng = pnt.lng();
           lng = lng.toFixed(4);
+          currentCenter = new google.maps.LatLng(lat, lng);
           console.log("lat: "+lat+ " lng: "+lng);
         }
         // Event Mouseover
