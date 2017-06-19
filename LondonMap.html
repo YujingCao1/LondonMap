@@ -43,7 +43,7 @@
         var layer0_file = document.getElementById('layer0').checked;
         var layer1_file = document.getElementById('layer1').checked;
         var layer2_file = document.getElementById('layer2').checked;
-        var json;
+        var json, currentZoom = 0;
         var dataBox = document.getElementById('data-box');
         var formatDecimal = d3.format(".2f"), 
             formatPercent = d3.format(".2%");
@@ -110,13 +110,16 @@
         })
         // Create a Google Map
         function myMap() {
+            console.log("currentZoom: " + currentZoom)
             var mapCanvas = document.getElementById('map');
             var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
+            var zoomLevel = currentZoom != 0? currentZoom : 10;
             var mapOptions = {
                 center: myCenter,
-                zoom: 10
+                zoom: zoomLevel
             };
             map = new google.maps.Map(mapCanvas, mapOptions);
+            loadMapShapes();
             // // Hover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
@@ -199,8 +202,7 @@
                 });
             });
         });
-            loadMapShapes();
-        }
+    }
         // Autocomplete
         function initAutocomplete(){
             var mapCanvas = document.getElementById('map');
@@ -263,6 +265,10 @@
         // Load Map
         function loadMapShapes(){
             map.data.loadGeoJson(json);
+            map.addListener('zoom_changed', function() {
+                currentZoom = map.getZoom();
+                console.log('currentZoom: ' + currentZoom);
+            });
         }
         // Load Data
         function loadData(data, d){
@@ -340,16 +346,12 @@
                                     "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
                                     "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable) + "<br/>" + 
                                     "<strong>" + "Percentage"  + "</strong>" + ": " + formatPercent(e.feature.getProperty(variable)/e.feature.getProperty("2001POP")) + "<br/>"
-
-                    // document.getElementById('data-value').textContent = (e.feature.getProperty(variable)/e.feature.getProperty("2001POP")*100).toLocaleString() + '%';
                 }else{
                     var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
 
                     dataBox.innerHTML = 
                                     "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
                                     "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty("2001POP");
-
-                    //document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }
             }else{
                 if (variable == "JOBS_DENSI"){
@@ -360,14 +362,12 @@
                                     "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>" + 
                                     "<strong>" + sel + " in log scale" + "</strong>" + ": " + Math.log(e.feature.getProperty(variable)).toFixed(2) + "<br/>"
 
-                    // document.getElementById('data-value').textContent = Math.log(e.feature.getProperty(variable)).toLocaleString();
                 }else{
                     var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
 
                     dataBox.innerHTML = 
                                     "<strong>" + "District Name" + "</strong>" + ": " + e.feature.getProperty('PROV3NAME') + "<br/>" + 
                                     "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>"
-                   // document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
                 }
                 name = 'PROV3NAME';
             }
@@ -417,7 +417,7 @@
             var myCenter  = new google.maps.LatLng(51.5074,-0.1272);
             var mapOptions = {
                 center: myCenter,
-                zoom: 10
+                zoom: zoomLevel
             };
             map = new google.maps.Map(mapCanvas, mapOptions);
             var infoWindow = new google.maps.InfoWindow();
