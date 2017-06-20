@@ -1,3 +1,55 @@
+@media(min-width: 769px) {
+	#data-box{
+		top: 8%;
+		left: 31%;
+		font-size: 1em;
+		margin-left: 2%;
+	}
+	.nicebox{
+		font-size: 0.85em;
+	}
+	#census-variable{
+		font-size: 1em;
+	}
+	.control_box{
+		font-size: 1em;
+	}
+}
+@media(min-width: 426px) and (max-width: 768px){
+	#data-box{
+		top: 8%;
+		left: 31%;
+		font-size: 0.8em;
+		margin-left: 2%;
+	}
+	.nicebox{
+		font-size: 0.7em;
+	}
+	#census-variable{
+		font-size: 0.9em;
+	}
+	.control_box{
+		font-size: 0.9em;
+	}
+}
+@media (max-width: 425px){
+	#data-box{
+		top: 13%;
+		left: 1%;
+		margin-top: 1%;
+		font-size: 0.6em;
+	}
+	.nicebox{
+		font-size: 0.5em;
+	}
+	#census-variable{
+		font-size: 0.7em
+	}
+	.control_box{
+		font-size: 0.7em;
+	}
+
+}
 html, body, #map { 
 	height: 100%; 
 	margin: 0; 
@@ -9,7 +61,6 @@ html, body, #map {
     position: absolute;
     text-align: center;
     font-family: "Roboto", "Arial", sans-serif;
-    font-size: 16px;
     z-index: 5;
     background: rgb(255,255,255);
     border:  1px solid;
@@ -18,7 +69,7 @@ html, body, #map {
 #controls1 {
 	top: 8%;
 	right: 3%;
-	width: 9%;
+	width: auto;
 	height: auto;
 }
 
@@ -26,39 +77,39 @@ html, body, #map {
     position: absolute;
     text-align: center;
     font-family: "Roboto", "Arial", sans-serif;
-    font-size: 13px;
     z-index: 5;
     box-shadow: 0 4px 6px -4px #333;
-    padding: 5px 10px;
+    padding: 0.5% 1%;
     background: rgb(255,255,255);
     background: linear-gradient(to bottom,rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
     border: rgb(229, 229, 229) 1px solid;
+    height: auto;
   }
 
 #controls {
-	top: 2%;
-	left: 9%;
+	top: 8%;
+	left: 1%;
 	width: 28%;
-	height: 5%;
+	height: auto;
 }
 
 #data-box {
-	top: 2%;
-	left: 39%;
-	height: 5%;
-	line-height: 45px;
+	height: auto;
+	line-height:17px;
 	display: none;
+	text-align: left;
+	float: left;
 }
 
 #census-variable {
 	width: 100%;
-	height: 20%;
+	height: auto;
 }
 
 #legend { 
 	display: flex; 
 	display: -webkit-box; 
-	padding-top: 7px;
+	padding-top: 2%;
 }
 
 .color-key {
@@ -80,7 +131,7 @@ html, body, #map {
 	line-height: 1.0em;
 }
 
-#data-value { 
+/*#data-value { 
 	font-size: 2.0em; 
 	font-weight: bold 
 }
@@ -93,13 +144,13 @@ html, body, #map {
 
 #data-label:after { 
 	content: ':' 
-}
+}*/
 
 #data-caret { 
-	margin-left: -5px; 
+	margin-left: -1.7%; 
 	display: none; 
-	font-size: 20px; 
-	width: 14px
+	font-size: 1.4em; 
+	width: 1%
 }
 
 #pac-input {
