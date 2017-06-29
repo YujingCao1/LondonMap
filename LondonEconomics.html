@@ -16,7 +16,6 @@
             <select id="census-variable">
                 <option value = JOBS_DENSI>Job Density</option>
                 <option value = MedWklyPay>Median Weekly Pay</option>
-                <option value = SQKM>Square Kilometers</option>
                 <option value = MdWrkPlcPa>Median Work Place Pay</option>
             </select>
         </div>
@@ -26,17 +25,19 @@
             <div id="census-max">max</div>
         </div>
     </div>
-    <div id="data-box", class="nicebox">
-        <label id="data-label" for="data-value"></label>
-        <span id="data-value"></span>
-    </div>
+    <div id="data-box", class="nicebox"></div>
     <div id="map"></div>
-     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div id="infowindow-content">
+      <span id="place-name"  class="title"></span><br>
+      <span id="place-address"></span>
+    </div>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <script type="text/javascript">
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
         var marker;
+        var dataBox = document.getElementById('data-box');
         // Create a Google Map
         function myMap() {
             
@@ -115,15 +116,25 @@
 
                 d3.json(json, function(error, json){
                     data = json;
-                    for (i=0 ; i<json.features.length; i++){
-                        attr_value[i] = json.features[i].properties[attribution];
-                    }
+                    if (attribution != "JOBS_DENSI"){
+                        for (i=0 ; i<json.features.length; i++){
+                            attr_value[i] = json.features[i].properties[attribution];
+                        } 
+                    }else{
+                        for (i=0 ; i<json.features.length; i++){
+                        attr_value[i] = Math.log(json.features[i].properties[attribution]);
+                        } 
+                    }   
                     MinValue = d3.min(attr_value);
                     MaxValue = d3.max(attr_value);
                     map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
-                    var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                    if (attribution == "JOBS_DENSI"){
+                            var delta = (Math.log(feature.getProperty(attribution)) - MinValue)/ (MaxValue - MinValue);
+                        }else{
+                            var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                        }
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
@@ -142,54 +153,49 @@
                 });
 
             var input = document.getElementById('pac-input');
-            var searchBox = new google.maps.places.SearchBox(input);
 
-            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-            // Bias the SearchBox results towards current map's viewport.
-            map.addListener('bounds_changed', function(){
-                searchBox.setBounds(map.getBounds());
-            });
-            var markers = [];
-            google.maps.event.addListener(searchBox, 'places_changed', function(){
-                var places = searchBox.getPlaces();
-                if (places.length == 0){
-                    return;
+              var autocomplete = new google.maps.places.Autocomplete(input);
+              autocomplete.bindTo('bounds', map);
+
+              map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+
+              var infowindow = new google.maps.InfoWindow();
+              var infowindowContent = document.getElementById('infowindow-content');
+              infowindow.setContent(infowindowContent);
+              var marker = new google.maps.Marker({
+                map: map
+              });
+              marker.addListener('click', function() {
+                infowindow.open(map, marker);
+              });
+
+              autocomplete.addListener('place_changed', function() {
+                infowindow.close();
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                  return;
                 }
-                //Clear out the old markers.
-                markers.forEach(function(marker){
-                    marker.setMap(null);
+
+                if (place.geometry.viewport) {
+                  map.fitBounds(place.geometry.viewport);
+                } else {
+                  map.setCenter(place.geometry.location);
+                  map.setZoom(17);
+                }
+
+                // Set the position of the marker using the place ID and location.
+                marker.setPlace({
+                  placeId: place.place_id,
+                  location: place.geometry.location
                 });
-                markers = [];
-                // For each place, get the icon, name and location.
-                var bounds = new google.maps.LatLngBounds();
-                places.forEach(function(place){
-                    if(!place.geometry){
-                        console.log("Return place contains no geometry");
-                        return;
-                    }
-                    var icon = {
-                        url: place.icon,
-                        size: new google.maps.Size(71, 71),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(17, 34),
-                        scaledSize: new google.maps.Size(25, 25)
-                    };
-                    // Create a marker for each place.
-                    markers.push(new google.maps.Marker({
-                        map: map,
-                        icon: icon,
-                        title:place.name,
-                        positon:place.geometry.location
-                    }));
-                    if (place.geometry.viewport){
-                        // Only geocodes have viewport
-                        bounds.union(place.geometry.viewport);
-                    }else{
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                map.fitBounds(bounds);
-            });
+                marker.setVisible(true);
+
+                infowindowContent.children['place-name'].textContent = place.name;
+                infowindowContent.children['place-address'].textContent =
+                    place.formatted_address;
+                infowindow.open(map, marker);
+              });
+           
             // Load the Map
             loadMapShapes();
         }
@@ -204,7 +210,11 @@
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
-                    var censusVariable = json.features[i].properties[d];
+                    if (d == "JOBS_DENSI"){
+                            var censusVariable = Math.log(data.features[i].properties[d]);
+                        }else{
+                            var censusVariable = data.features[i].properties[d];
+                        }
                     // Keep Track of Min and Max Values
                     if (censusVariable < censusMin){
                         censusMin = censusVariable;
@@ -238,10 +248,25 @@
         function mouseInToRegion(e){
             map.data.revertStyle();
             var variable = optionsAttr.value;
-            var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+            var sel = optionsAttr.options[optionsAttr.selectedIndex].text;
+
+            //var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+              if (variable == "JOBS_DENSI"){
+                    var percent = (Math.log(e.feature.getProperty(variable)) - censusMin) /(censusMax - censusMin) * 100;
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "District Name" + "</strong>" + ": " + e.feature.getProperty('PROV3NAME') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>" + 
+                                    "<strong>" + sel + " in log scale" + "</strong>" + ": " + Math.log(e.feature.getProperty(variable)).toFixed(2) + "<br/>"
+
+                }else{
+                    var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "District Name" + "</strong>" + ": " + e.feature.getProperty('PROV3NAME') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable).toFixed(2) + "<br/>"
+                }
           // update the label
-            document.getElementById('data-label').textContent = e.feature.getProperty('PROV3NAME');
-            document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
