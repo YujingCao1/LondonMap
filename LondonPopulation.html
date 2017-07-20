@@ -34,6 +34,8 @@
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
         var marker;
         var dataBox = document.getElementById('data-box');
+        var formatDecimal = d3.format(".2f"), 
+            formatPercent = d3.format(".2%");
 
         var attributionJSON = d3.json('PopList.json',function(json){
             attributesJSON = json;
@@ -154,7 +156,7 @@
                     }
                     return ({
                         fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
-                        strokeWeight: 1.2,
+                        strokeWeight: 0.5,
                         fillOpacity: 0.8,
                         strokeColor: '#fff'
                     })
