@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0">
-    <title>Restaurants in London UK</title>
+    <title>London Population</title>
     <script src='http://d3js.org/d3.v3.min.js'></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
     <script src="js/colorbrewer.js"></script>
@@ -13,12 +13,7 @@
 <body>
     <div id="controls" class="nicebox">
         <div>
-            <select id="census-variable">
-                <option value = 2001POP>Population in Year 2011</option>
-                <option value = INHOUSEHOL>INHOUSEHOL</option>
-                <option value = INCOMMUNAL>INCOMMUNAL</option>
-                <option value = STUDENTAWA>STUDENTAWA</option>
-            </select>
+            <select id="census-variable"></select>
         </div>
         <div id="legend">
             <div id="census-min" style="">min</div>
@@ -26,20 +21,42 @@
             <div id="census-max">max</div>
         </div>
     </div>
-    <div id="data-box", class="nicebox">
-        <label id="data-label" for="data-value"></label>
-        <span id="data-value"></span>
-    </div>
+    <div id="data-box", class="nicebox"></div>
     <div id="map"></div>
+    <div id="infowindow-content">
+      <span id="place-name"  class="title"></span><br>
+      <span id="place-address"></span>
+    </div>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <script type="text/javascript">
         var map;
         var censusMin = Number.MAX_VALUE, censusMax = -Number.MAX_VALUE;
         var optionsAttr = document.getElementById('census-variable'); // Show the selected one
         var marker;
+        var dataBox = document.getElementById('data-box');
+
+        var attributionJSON = d3.json('PopList.json',function(json){
+            attributesJSON = json;
+            d3.select("#census-variable").selectAll("option")
+                    .data(attributesJSON)
+                    .enter()
+                    .append("option")
+                    .attr("id", function(d,i) {
+                        return ("option" + i)
+                    })
+                    .text(function(d) {
+                        return d.name;
+                    })
+                    .attr("value", function(d){
+                        return d.id;
+                    })
+        })
+
         // Create a Google Map
         function myMap() {
             
-            var json = "PopulationCharacteristics.json";
+            var json = "Population.json";
+            var foodJson = "LondonFood.json";
             var mapCanvas = document.getElementById('map');
             var myCenter  = new google.maps.LatLng(51.5074,-0.1278);
             var mapOptions = {
@@ -49,7 +66,53 @@
 
             // Load Map
             map = new google.maps.Map(mapCanvas, mapOptions);
-            // Hoover to Highlight Selected City
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            // Add Markers to Denote the Buildings
+            d3.json(foodJson, function(error, json){
+                data = foodJson;
+                
+                for (i = 0; i<foodJson.length; i++){
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(foodJson[i].Latitude, foodJson[i].Longitude),
+                        map: map,
+                        title: foodJson[i].BusinessName
+                    });
+
+                    google.maps.event.addListener(marker, 'click', (function(marker,i){
+                        return function(){
+                            infoWindow.setContent("<div style = 'height: 100px; width: 200px; font-size: 12px'>" 
+                                     + "<strong>" + foodJson[i].BusinessName + "</strong>"
+                                     + "<br>" + foodJson[i].BusinessType + "<br>"
+                                     + "Address: " + foodJson[i].AddressLine1   + ", " + foodJson[i].AddressLine2 + ", " + foodJson[i].AddressLine3 + ", " + foodJson[i].AddressLine4 + ", " + foodJson[i].PostCode
+                                     + "<br>" + "Rating Value: " + foodJson[i].RatingValue
+                                     + "<br>" + "Hygiene Rate: " + foodJson[i].Hygiene)
+                                     + "</div>";
+                            infoWindow.open(map,marker);
+                        }
+                    })(marker,i));
+                }
+            });
+
+            // Click on Markers to show the Info
+
+            d3.json(foodJson, function(error,json){
+                data = foodJson;
+
+                for (i = 0; i<foodJson.length; i++){
+                    infoWindow = new google.maps.InfoWindow({
+                        content: + "<strong>" + foodJson[i].BusinessName + "</strong>"
+                                     + "<br>" + foodJson[i].BusinessType
+                                     + "Address: " + foodJson[i].AddressLine1   + ", " + foodJson[i].AddressLine2 + ", " + foodJson[i].AddressLine3 + ", " + foodJson[i].AddressLine4 + ", " +foodJson[i].PostCode
+                                     + "<br>" + "Rating Value: " + foodJson[i].RatingValue
+                                     + "<br>" + "Hygiene Rate: " + foodJson[i].Hygiene
+                    }); 
+                }
+            });
+
+            
+            // Hover to Highlight Selected City
             map.data.addListener('mouseover', mouseInToRegion);
             // Remove the Style
             map.data.addListener('mouseout', mouseOutOfRegion);
@@ -58,7 +121,6 @@
                 clearData();
                 loadData(optionsAttr.options[optionsAttr.selectedIndex].value);
             });
-
             google.maps.event.addDomListener(optionsAttr, 'change', function(){
                 var MinValue;
                 var MaxValue;
@@ -68,47 +130,105 @@
 
                 d3.json(json, function(error, json){
                     data = json;
-                    for (i=0 ; i<json.features.length; i++){
-                        attr_value[i] = json.features[i].properties[attribution];
-                    }
+                    if (attribution != "2001POP"){
+                        for (i=0 ; i<json.features.length; i++){
+                            attr_value[i] = json.features[i].properties[attribution]/json.features[i].properties["2001POP"]*100;
+                        }
+                    }else{
+                        for (i=0 ; i<json.features.length; i++){
+                            attr_value[i] = json.features[i].properties[attribution];
+                        }
+                    }   
                     MinValue = d3.min(attr_value);
                     MaxValue = d3.max(attr_value);
-                });
                     map.data.setStyle(function(feature){
                     var low = [5, 69, 54];
                     var high = [151, 83, 34];
-                    var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                    if (attribution != "2001POP"){
+                            var delta = ((feature.getProperty(attribution)/feature.getProperty("2001POP") * 100) - MinValue)/ (MaxValue - MinValue);
+                        }else{
+                            var delta = (feature.getProperty(attribution) - MinValue)/ (MaxValue - MinValue);
+                        }
                     for (var i = 0; i < 3; i++){
                         colorFill[i] = (high[i] - low[i]) * delta + low[i];
                     }
                     return ({
                         fillColor: 'hsl(' + colorFill[0] + ',' + colorFill[1] + '%,' + colorFill[2] + '%)',
-                        strokeWeight: 0,
+                        strokeWeight: 1.2,
                         fillOpacity: 0.8,
                         strokeColor: '#fff'
                     })
-                });
-            })
-   
+                });           
+            });
+        })
             // Get Lat and Lng
             google.maps.event.addListener(map, 'click', function (event) {
                    displayCoordinates(event.latLng);               
                 });
+
+            var input = document.getElementById('pac-input');
+
+              var autocomplete = new google.maps.places.Autocomplete(input);
+              autocomplete.bindTo('bounds', map);
+
+              map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+
+              var infowindow = new google.maps.InfoWindow();
+              var infowindowContent = document.getElementById('infowindow-content');
+              infowindow.setContent(infowindowContent);
+              var marker = new google.maps.Marker({
+                map: map
+              });
+              marker.addListener('click', function() {
+                infowindow.open(map, marker);
+              });
+
+              autocomplete.addListener('place_changed', function() {
+                infowindow.close();
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                  return;
+                }
+
+                if (place.geometry.viewport) {
+                  map.fitBounds(place.geometry.viewport);
+                } else {
+                  map.setCenter(place.geometry.location);
+                  map.setZoom(17);
+                }
+
+                // Set the position of the marker using the place ID and location.
+                marker.setPlace({
+                  placeId: place.place_id,
+                  location: place.geometry.location
+                });
+                marker.setVisible(true);
+
+                infowindowContent.children['place-name'].textContent = place.name;
+                infowindowContent.children['place-address'].textContent =
+                    place.formatted_address;
+                infowindow.open(map, marker);
+              });
+           
             // Load the Map
             loadMapShapes();
         }
         // Load Map
         function loadMapShapes(){
-            map.data.loadGeoJson('PopulationCharacteristics.json');
+            map.data.loadGeoJson('Population.json');
             google.maps.event.trigger(document.getElementById('census-variable'), 'change');
         }
         // Load Data
         function loadData(d){
-            var json = "PopulationCharacteristics.json";
+            var json = "Population.json";
             d3.json(json, function(error, json){
                 data = json;
                 for (var i = 0; i < json.features.length; i++) {
-                    var censusVariable = json.features[i].properties[d];
+                    if (d != "2001POP"){
+                            var censusVariable = data.features[i].properties[d]/data.features[i].properties["2001POP"] * 100;
+                        }else{
+                            var censusVariable = data.features[i].properties[d];
+                        }
                     // Keep Track of Min and Max Values
                     if (censusVariable < censusMin){
                         censusMin = censusVariable;
@@ -142,10 +262,24 @@
         function mouseInToRegion(e){
             map.data.revertStyle();
             var variable = optionsAttr.value;
-            var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+            var sel = optionsAttr.options[optionsAttr.selectedIndex].text;
+
+            //var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+              if (variable != "2001POP"){
+                    var percent = ((e.feature.getProperty(variable)/e.feature.getProperty("2001POP") * 100) - censusMin) /(censusMax - censusMin) * 100;
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty(variable) + "<br/>" + 
+                                    "<strong>" + "Percentage"  + "</strong>" + ": " + formatPercent(e.feature.getProperty(variable)/e.feature.getProperty("2001POP")) + "<br/>"
+                }else{
+                    var percent = (e.feature.getProperty(variable) - censusMin) /(censusMax - censusMin) * 100;
+
+                    dataBox.innerHTML = 
+                                    "<strong>" + "Census Output Area" + "</strong>" + ": " + e.feature.getProperty('COA_Code') + "<br/>" + 
+                                    "<strong>" + sel + "</strong>" + ": " + e.feature.getProperty("2001POP");
+                }
           // update the label
-            document.getElementById('data-label').textContent = e.feature.getProperty('COA_Code');
-            document.getElementById('data-value').textContent = e.feature.getProperty(variable).toLocaleString();
             document.getElementById('data-box').style.display = 'block';
             document.getElementById('data-caret').style.display = 'block';
             document.getElementById('data-caret').style.paddingLeft = percent + '%';
@@ -156,6 +290,6 @@
            map.data.revertStyle();
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&callback=myMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwliwbM5L67cRMDQhOYNEeR3a5Sv1gIOk&&libraries=places&callback=myMap"></script>
 </body>
 </html>
